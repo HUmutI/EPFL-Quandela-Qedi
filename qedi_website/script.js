@@ -532,19 +532,10 @@ document.addEventListener('DOMContentLoaded', () => {
         fetch('assets/mae_surface.json')
             .then(response => response.json())
             .then(data => {
-                // Build a 2D array of formatted strings for the text labels
-                // We truncate to 4 decimals to match the python plot's "val:.4f"
-                const textLabels = data.surface.map(row =>
-                    row.map(val => val === null || isNaN(val) ? "" : val.toFixed(4))
-                );
-
                 const traceMae = {
                     z: data.surface,
                     x: data.maturities.map(m => m < 1 ? m.toFixed(2) : m.toFixed(1)),
                     y: data.tenors.map(t => t + 'Y'),
-                    text: textLabels,
-                    texttemplate: "%{text}",
-                    textfont: { size: 9 }, // small font to fit inside pixels
                     type: 'heatmap',
                     colorscale: 'Plasma',
                     zmin: 0, // strict 0 minimum for absolute error scaling
