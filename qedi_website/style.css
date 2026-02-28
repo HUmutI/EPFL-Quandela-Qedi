@@ -201,6 +201,11 @@ h3 {
     object-fit: contain;
 }
 
+.bilkent-logo img {
+    height: 65px;
+    /* Slightly smaller than the METU logo */
+}
+
 .metu-logo,
 .bilkent-logo {
     display: flex;
