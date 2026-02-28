@@ -95,6 +95,6 @@ Proudly built during the 48-hour **EPFL Quantum Hackathon 2026**.
 
 <br/>
 <div align="center">
-  <img src="qedi_website/assets/metu_logo.png" alt="METU Logo" width="120"/>
+  <img src="qedi_website/assets/metu_logo.jpg" alt="METU Logo" width="120"/>
   <p><i>Middle East Technical University</i></p>
 </div>
