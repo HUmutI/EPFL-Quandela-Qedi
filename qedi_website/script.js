@@ -409,28 +409,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 const halfIdx = Math.floor(totalPoints / 2);
 
                 // Initialize the base plot
-                const traceTrue = {
+                // 1. The full target reality (faded grey, acts as the absolute background)
+                const traceTrueBase = {
                     x: xFrames,
                     y: data.true_pc1,
                     mode: 'lines',
-                    name: 'Market Reality (Target)',
-                    line: { color: 'rgba(68, 68, 68, 0.4)', width: 3 } // Dark slate
+                    name: 'Target (Unknown Future)',
+                    line: { color: 'rgba(68, 68, 68, 0.4)', width: 3 }
                 };
 
-                const tracePredStatic = {
+                // 2. The known history ground truth (solid red for the first half, and grows dynamically)
+                const traceKnownTruth = {
                     x: xFrames.slice(0, halfIdx),
-                    y: data.pred_pc1.slice(0, halfIdx),
+                    y: data.true_pc1.slice(0, halfIdx),
                     mode: 'lines',
-                    name: 'Historical Track (Red)',
-                    line: { color: 'rgba(227, 0, 15, 1)', width: 3 } // EPFL red
+                    name: 'Known Market History',
+                    line: { color: 'rgba(227, 0, 15, 1)', width: 3 }
                 };
 
+                // 3. The QRC Prediction (draws the next 6 days in green)
                 const tracePredAnim = {
                     x: [xFrames[halfIdx - 1]],
                     y: [data.pred_pc1[halfIdx - 1]],
                     mode: 'lines',
-                    name: 'Future QRC Projection (6-day chunks)',
-                    line: { color: 'rgba(46, 204, 113, 1)', width: 3 } // Green
+                    name: 'QRC Prediction Engine',
+                    line: { color: 'rgba(46, 204, 113, 1)', width: 4 }
                 };
 
                 const layout = {
@@ -450,39 +453,67 @@ document.addEventListener('DOMContentLoaded', () => {
                     legend: { orientation: 'h', x: 0.5, y: 1.1, xanchor: 'center' }
                 };
 
-                Plotly.newPlot('plot-pca-anim', [traceTrue, tracePredStatic, tracePredAnim], layout, { responsive: true });
+                Plotly.newPlot('plot-pca-anim', [traceTrueBase, traceKnownTruth, tracePredAnim], layout, { responsive: true });
 
                 // Animation Engine
                 let animReq;
+                let animTimeout;
                 function runAnimation() {
                     cancelAnimationFrame(animReq);
-                    // Reset to initial state
+                    clearTimeout(animTimeout);
+
+                    // Reset to initial state (halfIdx is the current "present day" anchor)
                     Plotly.update('plot-pca-anim', {
                         x: [xFrames, xFrames.slice(0, halfIdx), [xFrames[halfIdx - 1]]],
-                        y: [data.true_pc1, data.pred_pc1.slice(0, halfIdx), [data.pred_pc1[halfIdx - 1]]]
+                        y: [data.true_pc1, data.true_pc1.slice(0, halfIdx), [data.pred_pc1[halfIdx - 1]]]
                     }, {}, [0, 1, 2]);
 
-                    let frameIdx = halfIdx - 1;
-                    function animateStep() {
-                        const stepSize = 6; // Draw 6 days per frame sequentially
-                        frameIdx += stepSize;
-                        if (frameIdx >= totalPoints) frameIdx = totalPoints - 1;
+                    let anchorIdx = halfIdx - 1;
 
+                    function animateStep() {
+                        const stepSize = 6;
+                        let nextAnchor = anchorIdx + stepSize;
+                        if (nextAnchor >= totalPoints) nextAnchor = totalPoints - 1;
+
+                        // Step 1: Predict 6 days into the future with Green Line (shooting out from the anchor)
                         Plotly.update('plot-pca-anim', {
-                            x: [xFrames, xFrames.slice(0, halfIdx), xFrames.slice(halfIdx - 1, frameIdx + 1)],
-                            y: [data.true_pc1, data.pred_pc1.slice(0, halfIdx), data.pred_pc1.slice(halfIdx - 1, frameIdx + 1)]
+                            x: [xFrames, xFrames.slice(0, anchorIdx + 1), xFrames.slice(anchorIdx, nextAnchor + 1)],
+                            y: [data.true_pc1, data.true_pc1.slice(0, anchorIdx + 1), data.pred_pc1.slice(anchorIdx, nextAnchor + 1)]
                         }, {}, [0, 1, 2]);
 
-                        if (frameIdx < totalPoints - 1) {
-                            setTimeout(() => {
-                                animReq = requestAnimationFrame(animateStep);
-                            }, 400); // Very clear distinct 6-day hops
+                        // Step 2: Time moves forward (Wait 500ms, then the red line "Known History" catches up to the green prediction)
+                        if (nextAnchor < totalPoints - 1) {
+                            animTimeout = setTimeout(() => {
+                                // Red line snaps forward 6 days (simulating time passing and the ground truth being revealed)
+                                anchorIdx = nextAnchor;
+
+                                // Erase the green line (since we are now at the new present day)
+                                Plotly.update('plot-pca-anim', {
+                                    x: [xFrames, xFrames.slice(0, anchorIdx + 1), [xFrames[anchorIdx]]],
+                                    y: [data.true_pc1, data.true_pc1.slice(0, anchorIdx + 1), [data.pred_pc1[anchorIdx]]]
+                                }, {}, [0, 1, 2]);
+
+                                // Wait a beat, then predict the next 6 days
+                                animTimeout = setTimeout(() => {
+                                    animReq = requestAnimationFrame(animateStep);
+                                }, 200);
+
+                            }, 800); // How long the green prediction stays on screen
+                        } else {
+                            // Final frame has been reached, lock the red line to the end eventually
+                            animTimeout = setTimeout(() => {
+                                Plotly.update('plot-pca-anim', {
+                                    x: [xFrames, xFrames.slice(0, nextAnchor + 1), []],
+                                    y: [data.true_pc1, data.true_pc1.slice(0, nextAnchor + 1), []]
+                                }, {}, [0, 1, 2]);
+                            }, 800);
                         }
                     }
-                    // Start the 6-day chunk animation
-                    setTimeout(() => {
+
+                    // Start the rolling forward-prediction animation
+                    animTimeout = setTimeout(() => {
                         animReq = requestAnimationFrame(animateStep);
-                    }, 500); // Brief pause before animation begins
+                    }, 500);
                 }
 
                 // Autoplay once loaded
