@@ -231,4 +231,39 @@ document.addEventListener('DOMContentLoaded', () => {
             renderBase();
         });
     }
+
+    /* --- Lightbox Functionality --- */
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxCaption = document.getElementById('lightbox-caption');
+    const closeBtn = document.querySelector('.lightbox-close');
+
+    if (lightbox) {
+        document.querySelectorAll('.zoomable').forEach(img => {
+            img.addEventListener('click', () => {
+                lightbox.classList.add('show');
+                lightboxImg.src = img.src;
+                lightboxCaption.innerText = img.nextElementSibling.innerText;
+            });
+        });
+
+        closeBtn.addEventListener('click', () => {
+            lightbox.classList.remove('show');
+        });
+
+        // Click outside the image to close
+        lightbox.addEventListener('click', (e) => {
+            if (e.target !== lightboxImg) {
+                lightbox.classList.remove('show');
+            }
+        });
+
+        // Escape key to close
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "Escape" && lightbox.classList.contains('show')) {
+                lightbox.classList.remove('show');
+            }
+        });
+    }
+
 });

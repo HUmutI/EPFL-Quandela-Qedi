@@ -193,14 +193,19 @@
                 </div>
             </div>
 
-            <div class="grid-2" style="margin-top: 4rem;">
+            <div class="grid-3" style="margin-top: 4rem;">
                 <div class="plot-box">
-                    <img src="assets/Champion_Hybrid_QNN_learning_curve.png" alt="QNN Learning Curve">
+                    <img src="assets/Champion_Hybrid_QNN_learning_curve.png" alt="QNN Learning Curve" class="zoomable">
                     <p class="caption">Hybrid QNN Learning Convergence (200 Epochs)</p>
                 </div>
                 <div class="plot-box">
-                    <img src="assets/Champion_Hybrid_QNN_Price_Prediction.png" alt="Price Prediction Mapping">
+                    <img src="assets/Champion_Hybrid_QNN_Price_Prediction.png" alt="Price Prediction Mapping"
+                        class="zoomable">
                     <p class="caption">Ground Truth vs QRC Market Prediction</p>
+                </div>
+                <div class="plot-box">
+                    <img src="assets/base_model_walk_forward_errors.jpg" alt="Walk Forward Errors" class="zoomable">
+                    <p class="caption">Base Model Walk Forward Errors</p>
                 </div>
             </div>
 
@@ -236,6 +241,13 @@
             </div>
         </div>
     </footer>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox">
+        <span class="lightbox-close">&times;</span>
+        <img class="lightbox-content" id="lightbox-img">
+        <div id="lightbox-caption"></div>
+    </div>
 
     <script src="script.js"></script>
 </body>
