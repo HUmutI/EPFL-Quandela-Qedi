@@ -346,6 +346,51 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('btn-day1').addEventListener('click', () => drawPlots(1));
                 document.getElementById('btn-day3').addEventListener('click', () => drawPlots(3));
                 document.getElementById('btn-day6').addEventListener('click', () => drawPlots(6));
+
+                // --- Draw Interactive Error Heatmap ---
+                const plotHeatmap = document.getElementById('plot-heatmap');
+                if (plotHeatmap) {
+                    let errors = [];
+                    let maxError = 0;
+
+                    // Compute error array: (predicted - actual)
+                    for (let d = 0; d < data.pred_days; d++) {
+                        let dayErrors = [];
+                        for (let f = 0; f < data.features.length; f++) {
+                            let err = data.predicted[d][f] - data.actual[d][f];
+                            dayErrors.push(err);
+                            if (Math.abs(err) > maxError) maxError = Math.abs(err);
+                        }
+                        errors.push(dayErrors);
+                    }
+
+                    const traceHeatmap = {
+                        z: errors,
+                        x: data.features,
+                        y: Array.from({ length: data.pred_days }, (_, i) => `Day ${i + 1}`),
+                        type: 'heatmap',
+                        colorscale: 'RdBu',
+                        zmin: -maxError,
+                        zmax: maxError,
+                        reversescale: true,
+                        colorbar: { title: "Error" },
+                        hovertemplate: 'Predictive Error: %{z}<br>Horizon: %{y}<br>Feature: %{x}<extra></extra>'
+                    };
+
+                    const layoutHeatmap = {
+                        margin: { l: 60, r: 20, b: 60, t: 20 },
+                        xaxis: {
+                            title: 'Feature Space (224 Mapped Tenor & Maturity Swaptions)',
+                            showticklabels: false
+                        },
+                        yaxis: { title: '' },
+                        paper_bgcolor: 'rgba(0,0,0,0)',
+                        plot_bgcolor: 'rgba(0,0,0,0)'
+                    };
+
+                    Plotly.newPlot('plot-heatmap', [traceHeatmap], layoutHeatmap, { responsive: true });
+                }
+
             })
             .catch(err => console.error("Error loading plot data:", err));
     }

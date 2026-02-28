@@ -199,7 +199,7 @@
                     <button class="btn-secondary" id="btn-day3">Day 3 Forecast</button>
                     <button class="btn-secondary" id="btn-day6">Day 6 Forecast</button>
                 </div>
-                <div class="grid-2">
+                <div class="grid-2" style="margin-bottom: 4rem;">
                     <div class="plot-box">
                         <div id="plot-actual"
                             style="height: 450px; width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
@@ -212,6 +212,15 @@
                         </div>
                         <p class="caption">MerLin Photonic QRC Prediction</p>
                     </div>
+                </div>
+
+                <h3 style="text-align: center; color: var(--dark-slate); margin-bottom: 2rem;">Interactive Error Heatmap
+                    (All Horizons)</h3>
+                <div class="plot-box" style="margin-bottom: 4rem;">
+                    <div id="plot-heatmap"
+                        style="height: 400px; width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                    </div>
+                    <p class="caption">Interactive Error Grid: (Predicted − Actual) across all 224 features.</p>
                 </div>
             </div>
 
