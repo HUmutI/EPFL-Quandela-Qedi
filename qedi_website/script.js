@@ -554,7 +554,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     yaxis: {
                         title: 'Tenor (years)',
                         autorange: true,
-                        type: 'category'
+                        type: 'category',
+                        scaleanchor: 'x',    // Locks the y-axis physical length to match the x-axis
+                        scaleratio: 1        // Forces exactly 1:1 perfect square aspect ratio per cell
                     },
                     paper_bgcolor: 'rgba(0,0,0,0)',
                     plot_bgcolor: 'rgba(0,0,0,0)'
