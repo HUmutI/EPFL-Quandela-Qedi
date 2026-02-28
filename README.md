@@ -20,12 +20,12 @@ Financial markets produce exceptionally non-linear, high-dimensional option stru
 
 Team Qedi bypassed classical deep learning entirely and engineered a **Hybrid Quantum Neural Network (QNN)** utilizing the vast state space of quantum entanglement. 
 
-Our pipeline is minimalist, robust, and mathematically avoids vanishing gradients:
+Our pipeline is minimalist, robust, and driven by **[MerLin (Photonic QRC)](https://merlinquantum.ai/)**, allowing us to mathematically avoid vanishing gradients:
 
 - 📉 **1. Dimensionality Compression:** 
   Raw 224-dimensional continuous option data is compressed down into 6 key latent topological dimensions using Classical PCA.
-- ⚛️ **2. Hilbert Space Reservoir:** 
-  These 6 time-series parameters are injected via `Rx / Ry / Rz` rotations directly into an exponentially deep entanglement loop on 6 qubits.
+- ⚛️ **2. Photonic Hilbert Space Reservoir (Powered by MerLin):** 
+  These 6 time-series parameters are injected directly into an exponentially deep photonic entanglement loop running on the MerLin quantum framework.
 - 🎯 **3. Ridge Regression Alignment:** 
   Based on cutting edge literature ([ArXiv: 2505.13933](https://arxiv.org/pdf/2505.13933)), we apply Ridge Regression over the measured states to mitigate system noise and extract highly stable target approximations.
 - ⚡ **4. Direct Linear Readout:** 
