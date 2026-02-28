@@ -25,7 +25,6 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-import json
 
 import perceval as pcvl
 from merlin import QuantumLayer, ComputationSpace, LexGrouping
@@ -227,7 +226,7 @@ def generate_plots(model, actual, predicted, features, train_days, pred_days, ou
     fig.tight_layout()
     fig.savefig(out / "pca_variance.png", dpi=150)
     plt.close(fig)
-    print("  [1/7] PCA variance plot saved")
+    print("  [1/8] PCA variance plot saved")
 
     # ── Plot 2: Training Fit — PCA space (per component) ─────────────────
     y_true_pca = model["train_true_pca"]
@@ -250,7 +249,7 @@ def generate_plots(model, actual, predicted, features, train_days, pred_days, ou
     fig.tight_layout()
     fig.savefig(out / "training_fit_pca.png", dpi=150, bbox_inches="tight")
     plt.close(fig)
-    print("  [2/7] Training fit (PCA) plot saved")
+    print("  [2/8] Training fit (PCA) plot saved")
 
     # ── Plot 3: Training Fit — Price space (sample features) ─────────────
     sample_idx = np.linspace(0, len(features) - 1, 6, dtype=int)
@@ -268,7 +267,7 @@ def generate_plots(model, actual, predicted, features, train_days, pred_days, ou
     fig.tight_layout()
     fig.savefig(out / "training_fit_prices.png", dpi=150, bbox_inches="tight")
     plt.close(fig)
-    print("  [3/7] Training fit (prices) plot saved")
+    print("  [3/8] Training fit (prices) plot saved")
 
     # ── Plot 4: Training Residual Distribution ───────────────────────────
     residuals = (y_true_px - y_pred_px).flatten()
@@ -285,7 +284,7 @@ def generate_plots(model, actual, predicted, features, train_days, pred_days, ou
     fig.tight_layout()
     fig.savefig(out / "training_residuals.png", dpi=150)
     plt.close(fig)
-    print("  [4/7] Training residuals plot saved")
+    print("  [4/8] Training residuals plot saved")
 
     # ── Plot 5: Inference — Predicted vs Actual Scatter ──────────────────
     fig, ax = plt.subplots(figsize=(7, 7))
@@ -303,7 +302,7 @@ def generate_plots(model, actual, predicted, features, train_days, pred_days, ou
     fig.tight_layout()
     fig.savefig(out / "inference_scatter.png", dpi=150)
     plt.close(fig)
-    print("  [5/7] Inference scatter plot saved")
+    print("  [5/8] Inference scatter plot saved")
 
     # ── Plot 6: Inference — Error Heatmap ────────────────────────────────
     errors = predicted - actual  # (PRED_DAYS, 224)
@@ -318,7 +317,7 @@ def generate_plots(model, actual, predicted, features, train_days, pred_days, ou
     fig.tight_layout()
     fig.savefig(out / "inference_error_heatmap.png", dpi=150)
     plt.close(fig)
-    print("  [6/7] Inference error heatmap saved")
+    print("  [6/8] Inference error heatmap saved")
 
     # ── Plot 7: Inference — Per-day MSE bar chart ────────────────────────
     day_mse = [mean_squared_error(actual[d], predicted[d]) for d in range(pred_days)]
@@ -341,7 +340,435 @@ def generate_plots(model, actual, predicted, features, train_days, pred_days, ou
     fig.tight_layout()
     fig.savefig(out / "inference_per_day_error.png", dpi=150)
     plt.close(fig)
-    print("  [7/7] Per-day error bar chart saved")
+    print("  [7/8] Per-day error bar chart saved")
+
+    # ── Plot 8: Tenor × Maturity MAE Surface Heatmaps ────────────────────
+    # Parse tenor/maturity from feature column names
+    def _parse_col(col):
+        parts = col.split(";")
+        tenor    = float(parts[0].split(":")[1].strip())
+        maturity = float(parts[1].split(":")[1].strip())
+        return tenor, maturity
+
+    tm_map = {c: _parse_col(c) for c in features}
+    tenors     = sorted({t for t, _ in tm_map.values()})
+    maturities = sorted({m for _, m in tm_map.values()})
+    n_ten, n_mat = len(tenors), len(maturities)
+
+    # Helper: build a surface from per-feature absolute errors for given days
+    def _build_surface(abs_errs):
+        """abs_errs: shape (n_features,) — already averaged over desired days."""
+        surface = np.full((n_ten, n_mat), np.nan)
+        for fi, feat in enumerate(features):
+            t, m = tm_map[feat]
+            surface[tenors.index(t), maturities.index(m)] = abs_errs[fi]
+        return surface
+
+    # Build per-day surfaces + average
+    per_day_surfaces = []
+    for d in range(pred_days):
+        per_day_surfaces.append(_build_surface(np.abs(actual[d] - predicted[d])))
+    avg_surface = _build_surface(np.mean(np.abs(actual - predicted), axis=0))
+
+    # Global color range: 0 → max across ALL surfaces (for consistent comparison)
+    global_max = max(np.nanmax(avg_surface),
+                     max(np.nanmax(s) for s in per_day_surfaces))
+
+    # Tick labels
+    x_labels = [f"{m:.2f}" if m < 1 else f"{m:.1f}" for m in maturities]
+    y_labels = [f"{int(t)}Y" if t == int(t) else f"{t}Y" for t in tenors]
+
+    def _draw_heatmap(ax, surface, title, vmax, annotate=True):
+        im = ax.imshow(surface, cmap="plasma", aspect="auto",
+                       interpolation="bilinear", origin="lower",
+                       vmin=0, vmax=vmax)
+        ax.set_xticks(range(n_mat))
+        ax.set_xticklabels(x_labels, rotation=45, ha="right", fontsize=7)
+        ax.set_yticks(range(n_ten))
+        ax.set_yticklabels(y_labels, fontsize=8)
+        ax.set_xlabel("Maturity (years)", fontsize=9)
+        ax.set_ylabel("Tenor (years)", fontsize=9)
+        ax.set_title(title, fontsize=11, fontweight="bold")
+        if annotate:
+            for ti in range(n_ten):
+                for mi in range(n_mat):
+                    val = surface[ti, mi]
+                    if not np.isnan(val):
+                        text_color = "white" if val > 0.55 * vmax else "black"
+                        ax.text(mi, ti, f"{val:.4f}", ha="center", va="center",
+                                fontsize=4.5, color=text_color)
+        return im
+
+    # ── 8a: Average + 3D ─────────────────────────────────────────────────
+    fig, axes = plt.subplots(1, 2, figsize=(22, 8),
+                              gridspec_kw={"width_ratios": [1, 1]})
+
+    im = _draw_heatmap(axes[0], avg_surface,
+                       f"MAE — Averaged over Days {train_days+1}–{train_days+pred_days}",
+                       global_max, annotate=True)
+    cbar = fig.colorbar(im, ax=axes[0], shrink=0.85, pad=0.02)
+    cbar.set_label("MAE (price units)", fontsize=10)
+    cbar.set_ticks([0, global_max / 4, global_max / 2, 3 * global_max / 4, global_max])
+    cbar.set_ticklabels([f"{v:.5f}" for v in
+                         [0, global_max/4, global_max/2, 3*global_max/4, global_max]])
+    cbar.ax.set_ylabel("0 = perfect  ←  MAE  →  worst", fontsize=8,
+                       rotation=270, labelpad=18)
+
+    # 3D surface
+    ax3d = fig.add_subplot(1, 2, 2, projection="3d")
+    M, T = np.meshgrid(range(n_mat), range(n_ten))
+    surf = ax3d.plot_surface(M, T, avg_surface, cmap="plasma",
+                              edgecolor="none", alpha=0.9, antialiased=True,
+                              vmin=0, vmax=global_max)
+    ax3d.set_xlabel("Maturity", fontsize=9, labelpad=8)
+    ax3d.set_ylabel("Tenor", fontsize=9, labelpad=8)
+    ax3d.set_zlabel("MAE", fontsize=9, labelpad=8)
+    ax3d.set_zlim(0, global_max * 1.05)
+    ax3d.set_title("3D Error Surface (Average)", fontsize=12,
+                   fontweight="bold", pad=15)
+    ax3d.set_xticks(range(0, n_mat, 3))
+    ax3d.set_xticklabels([f"{maturities[i]:.1f}" for i in range(0, n_mat, 3)],
+                         fontsize=7)
+    ax3d.set_yticks(range(0, n_ten, 2))
+    ax3d.set_yticklabels([f"{int(tenors[i])}Y" for i in range(0, n_ten, 2)],
+                         fontsize=7)
+    ax3d.view_init(elev=25, azim=-60)
+    cb3 = fig.colorbar(surf, ax=ax3d, shrink=0.6, pad=0.1)
+    cb3.set_ticks([0, global_max])
+    cb3.set_ticklabels(["0 (perfect)", f"{global_max:.5f} (max)"])
+
+    fig.suptitle("Inference Error Surface — Tenor vs Maturity (Averaged)",
+                 fontsize=14, fontweight="bold", y=1.02)
+    fig.tight_layout()
+    fig.savefig(out / "tenor_maturity_mae_surface.png", dpi=200, bbox_inches="tight",
+                facecolor="white", edgecolor="none")
+    plt.close(fig)
+    print("  [8a/8] Tenor × Maturity MAE surface (average) saved")
+
+    # ── 8b: All individual days ──────────────────────────────────────────
+    n_cols = 3
+    n_rows = int(np.ceil(pred_days / n_cols))
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(8 * n_cols, 7 * n_rows))
+    axes = np.atleast_2d(axes)
+
+    for d in range(pred_days):
+        row, col = divmod(d, n_cols)
+        ax = axes[row, col]
+        day_label = f"Day {train_days + d + 1}"
+        day_mse = mean_squared_error(actual[d], predicted[d])
+        day_mae_val = mean_absolute_error(actual[d], predicted[d])
+        im = _draw_heatmap(ax, per_day_surfaces[d],
+                           f"{day_label}  (MAE={day_mae_val:.5f}, MSE={day_mse:.2e})",
+                           global_max, annotate=True)
+        cbar = fig.colorbar(im, ax=ax, shrink=0.82, pad=0.02)
+        cbar.set_ticks([0, global_max])
+        cbar.set_ticklabels(["0", f"{global_max:.4f}"])
+
+    # Hide unused subplots
+    for d in range(pred_days, n_rows * n_cols):
+        row, col = divmod(d, n_cols)
+        axes[row, col].axis("off")
+
+    fig.suptitle(f"Inference Error Surface — Each Day Separately\n"
+                 f"(color scale: 0 = deep purple → {global_max:.5f} = bright yellow)",
+                 fontsize=15, fontweight="bold", y=1.01)
+    fig.tight_layout()
+    fig.savefig(out / "tenor_maturity_mae_per_day.png", dpi=200, bbox_inches="tight",
+                facecolor="white", edgecolor="none")
+    plt.close(fig)
+    print("  [8b/8] Tenor × Maturity MAE surface (per-day) saved")
+
+
+def visualize_circuit(out):
+    """Generate publication-quality circuit and pipeline diagrams."""
+
+    # ── 1. Perceval circuit rendering (simplified 2-layer for clarity) ──
+    print("  [C1] Rendering Perceval circuit (simplified 2-layer)...")
+    saved_figs = []
+    original_show = plt.show
+    def capture_show(*args, **kwargs):
+        for fignum in plt.get_fignums():
+            saved_figs.append(plt.figure(fignum))
+    plt.show = capture_show
+
+    # Build a 2-layer version for readability
+    circ_small, _ = build_circuit(N_MODES, N_ENCODE, 2, seed=42)
+    pcvl.pdisplay(circ_small, output_format=pcvl.Format.MPLOT)
+    if saved_figs:
+        saved_figs[-1].savefig(out / "circuit_perceval_2layer.png",
+                               dpi=200, bbox_inches="tight",
+                               facecolor="white", edgecolor="none")
+    plt.close("all")
+    saved_figs.clear()
+
+    # Full 5-layer circuit
+    print("  [C2] Rendering Perceval circuit (full 5-layer)...")
+    circ_full, _ = build_circuit(N_MODES, N_ENCODE, N_LAYERS, seed=42)
+    pcvl.pdisplay(circ_full, output_format=pcvl.Format.MPLOT)
+    if saved_figs:
+        saved_figs[-1].savefig(out / "circuit_perceval_full.png",
+                               dpi=200, bbox_inches="tight",
+                               facecolor="white", edgecolor="none")
+    plt.close("all")
+    plt.show = original_show
+
+    # ── 2. Schematic architecture diagram ─────────────────────────────
+    print("  [C3] Creating architecture schematic...")
+    fig, ax = plt.subplots(figsize=(18, 10))
+    ax.set_xlim(-1, 17)
+    ax.set_ylim(-1, 10)
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+    # Title
+    ax.text(8, 9.5, "Quantum Reservoir Computing — Photonic Circuit Architecture",
+            ha="center", fontsize=16, fontweight="bold", color="#2c3e50")
+
+    # ── Draw 8 horizontal mode lines ──────────────────────────────────
+    mode_y = np.linspace(7.5, 1.5, N_MODES)
+    mode_labels = [f"Mode {i}" for i in range(N_MODES)]
+    photon_modes = list(range(N_PHOTONS))
+    encode_modes = list(range(N_ENCODE))
+
+    for i, y in enumerate(mode_y):
+        color = "#e74c3c" if i in photon_modes else "#bdc3c7"
+        lw = 2.5 if i in photon_modes else 1.5
+        ax.plot([1.5, 15.5], [y, y], color=color, linewidth=lw, zorder=1)
+        # Input state label
+        state = "| 1 ⟩" if i in photon_modes else "| 0 ⟩"
+        ax.text(1.2, y, state, ha="right", va="center", fontsize=10,
+                fontfamily="serif", color="#e74c3c" if i in photon_modes else "#7f8c8d")
+        ax.text(0.3, y, f"m{i}", ha="center", va="center", fontsize=9,
+                fontweight="bold", color="#2c3e50")
+
+    # ── Draw blocks for each layer ────────────────────────────────────
+    block_xs = [2.5, 5.0, 7.5, 10.0, 12.5]  # 5 layers
+    block_w = 1.8
+
+    for li, bx in enumerate(block_xs):
+        # Interferometer block (full modes)
+        rect = plt.Rectangle((bx - block_w/2, mode_y[-1] - 0.4),
+                              block_w, mode_y[0] - mode_y[-1] + 0.8,
+                              facecolor="#3498db", alpha=0.15, edgecolor="#3498db",
+                              linewidth=1.5, zorder=2, linestyle="-")
+        ax.add_patch(rect)
+        ax.text(bx, mode_y[-1] - 0.7, f"U{li+1}", ha="center", va="top",
+                fontsize=9, color="#3498db", fontweight="bold")
+
+        # Input encoding phase shifters (only on modes 0-4)
+        enc_x = bx + block_w/2 + 0.3
+        for m in range(N_ENCODE):
+            y = mode_y[m]
+            # Phase shifter symbol (small box)
+            ps_rect = plt.Rectangle((enc_x - 0.15, y - 0.2), 0.3, 0.4,
+                                     facecolor="#e67e22", alpha=0.8,
+                                     edgecolor="#d35400", linewidth=1.2, zorder=3)
+            ax.add_patch(ps_rect)
+            ax.text(enc_x, y, "φ", ha="center", va="center", fontsize=8,
+                    color="white", fontweight="bold", zorder=4)
+
+        # Label the encoding
+        if li == 0:
+            ax.annotate("Input\nencoding",
+                        xy=(enc_x, mode_y[N_ENCODE-1] - 0.5),
+                        xytext=(enc_x, mode_y[N_ENCODE-1] - 1.2),
+                        ha="center", fontsize=8, color="#d35400",
+                        arrowprops=dict(arrowstyle="->", color="#d35400"))
+
+    # Final interferometer
+    fx = 14.5
+    rect = plt.Rectangle((fx - block_w/2, mode_y[-1] - 0.4),
+                          block_w, mode_y[0] - mode_y[-1] + 0.8,
+                          facecolor="#9b59b6", alpha=0.15, edgecolor="#9b59b6",
+                          linewidth=1.5, zorder=2)
+    ax.add_patch(rect)
+    ax.text(fx, mode_y[-1] - 0.7, "U_final", ha="center", va="top",
+            fontsize=9, color="#9b59b6", fontweight="bold")
+
+    # Measurement symbol
+    ax.text(16.0, mode_y[3], "📊", ha="center", va="center", fontsize=20, zorder=5)
+    ax.text(16.0, mode_y[3] - 0.8, "Fock probs\n(UNBUNCHED)", ha="center",
+            va="top", fontsize=8, color="#7f8c8d")
+
+    # Legend
+    legend_y = 0.3
+    ax.plot([1.5, 2.2], [legend_y, legend_y], color="#e74c3c", linewidth=2.5)
+    ax.text(2.4, legend_y, "Photon-occupied mode", va="center", fontsize=9, color="#e74c3c")
+    ax.plot([6.0, 6.7], [legend_y, legend_y], color="#bdc3c7", linewidth=1.5)
+    ax.text(6.9, legend_y, "Vacuum mode", va="center", fontsize=9, color="#7f8c8d")
+    ps_r = plt.Rectangle((10.5, legend_y - 0.15), 0.3, 0.3,
+                           facecolor="#e67e22", edgecolor="#d35400", linewidth=1)
+    ax.add_patch(ps_r)
+    ax.text(11.0, legend_y, "Phase shifter (input encoding)", va="center",
+            fontsize=9, color="#d35400")
+
+    # Annotations
+    ax.annotate("", xy=(2.5, 8.5), xytext=(14.5, 8.5),
+                arrowprops=dict(arrowstyle="<->", color="#2c3e50", lw=1.5))
+    ax.text(8.5, 8.7, f"{N_LAYERS} encoding layers × {N_ENCODE} PS each = "
+            f"{TOTAL_ENC} input parameters",
+            ha="center", fontsize=10, color="#2c3e50")
+
+    # Bracket for memory modes
+    ax.annotate("", xy=(0.7, mode_y[N_ENCODE]), xytext=(0.7, mode_y[-1]),
+                arrowprops=dict(arrowstyle="-[", color="#27ae60", lw=1.5,
+                               mutation_scale=10))
+    ax.text(0.5, (mode_y[N_ENCODE] + mode_y[-1])/2, "No\nencoding",
+            ha="right", va="center", fontsize=8, color="#27ae60", fontstyle="italic")
+
+    fig.tight_layout()
+    fig.savefig(out / "circuit_architecture.png", dpi=200, bbox_inches="tight",
+                facecolor="white", edgecolor="none")
+    plt.close(fig)
+
+    # ── 3. Full pipeline diagram ──────────────────────────────────────
+    print("  [C4] Creating pipeline overview...")
+    fig, ax = plt.subplots(figsize=(20, 5))
+    ax.set_xlim(-0.5, 19)
+    ax.set_ylim(-1, 4)
+    ax.axis("off")
+
+    # Pipeline boxes
+    boxes = [
+        (0.5, "Raw Prices\n(N × 224)", "#ecf0f1", "#7f8c8d"),
+        (2.8, "Standard\nScaler", "#3498db", "white"),
+        (5.1, f"PCA\n(224 → {N_PCA})", "#2ecc71", "white"),
+        (7.4, f"Sliding\nWindow ({WINDOW})", "#e67e22", "white"),
+        (9.7, f"5× Perceval\nQRC (8m/3ph)", "#9b59b6", "white"),
+        (12.0, f"LexGrouping\n(→ 10/res)", "#e74c3c", "white"),
+        (14.0, "Concat\nQ + raw", "#1abc9c", "white"),
+        (16.0, f"Ridge\n(α={RIDGE_ALPHA})", "#f39c12", "white"),
+        (18.0, f"PCA⁻¹ +\nScaler⁻¹", "#3498db", "white"),
+    ]
+
+    for x, label, bg, fg in boxes:
+        w = 1.8
+        rect = plt.Rectangle((x - w/2, 0.5), w, 2.0,
+                               facecolor=bg, edgecolor="#2c3e50",
+                               linewidth=1.5, zorder=2,
+                               alpha=0.85 if bg != "#ecf0f1" else 0.5)
+        ax.add_patch(rect)
+        ax.text(x, 1.5, label, ha="center", va="center", fontsize=9,
+                color=fg, fontweight="bold", zorder=3)
+
+    # Arrows between boxes
+    arrow_xs = [(boxes[i][0] + 0.9, boxes[i+1][0] - 0.9) for i in range(len(boxes) - 1)]
+    for x1, x2 in arrow_xs:
+        ax.annotate("", xy=(x2, 1.5), xytext=(x1, 1.5),
+                    arrowprops=dict(arrowstyle="->", color="#2c3e50", lw=1.5))
+
+    # Dimension annotations
+    dims = [
+        (0.5, "N × 224"),
+        (2.8, "N × 224"),
+        (5.1, f"N × {N_PCA}"),
+        (7.4, f"(N-{WINDOW}) × {WINDOW*N_PCA}"),
+        (9.7, f"× {N_RESERVOIRS} reservoirs"),
+        (12.0, f"→ {LEX_OUT * N_RESERVOIRS} dim"),
+        (14.0, f"{LEX_OUT * N_RESERVOIRS + WINDOW*N_PCA} dim"),
+        (16.0, f"→ {N_PCA} PCA"),
+        (18.0, "→ 224 prices"),
+    ]
+    for x, label in dims:
+        ax.text(x, 0.2, label, ha="center", va="top", fontsize=7,
+                color="#7f8c8d", fontstyle="italic")
+
+    # Title
+    ax.text(9.25, 3.5, "Full Pipeline: Quantum Reservoir Computing for Swaption Pricing",
+            ha="center", fontsize=14, fontweight="bold", color="#2c3e50")
+
+    fig.tight_layout()
+    fig.savefig(out / "pipeline_overview.png", dpi=200, bbox_inches="tight",
+                facecolor="white", edgecolor="none")
+    plt.close(fig)
+
+    # ── 4. Reservoir ensemble diagram ─────────────────────────────────
+    print("  [C5] Creating reservoir ensemble diagram...")
+    fig, ax = plt.subplots(figsize=(14, 7))
+    ax.set_xlim(-1, 13)
+    ax.set_ylim(-1, 8)
+    ax.axis("off")
+
+    ax.text(6, 7.5, f"Ensemble of {N_RESERVOIRS} Fixed-Random Quantum Reservoirs",
+            ha="center", fontsize=14, fontweight="bold", color="#2c3e50")
+
+    # Input box
+    in_rect = plt.Rectangle((-0.5, 2.5), 2, 2.5,
+                              facecolor="#3498db", alpha=0.2,
+                              edgecolor="#3498db", linewidth=2)
+    ax.add_patch(in_rect)
+    ax.text(0.5, 4.3, "Input", ha="center", fontsize=11, fontweight="bold", color="#3498db")
+    ax.text(0.5, 3.6, f"PCA window\n{WINDOW}×{N_PCA} = {WINDOW*N_PCA} dim",
+            ha="center", fontsize=9, color="#2c3e50")
+
+    # Reservoir boxes
+    colors = ["#e74c3c", "#e67e22", "#f1c40f", "#2ecc71", "#9b59b6"]
+    for r in range(N_RESERVOIRS):
+        y = 6.0 - r * 1.2
+        # QRC box
+        rect = plt.Rectangle((3.0, y - 0.4), 3.5, 0.8,
+                               facecolor=colors[r], alpha=0.2,
+                               edgecolor=colors[r], linewidth=1.5)
+        ax.add_patch(rect)
+        ax.text(4.75, y, f"QRC #{r+1}  (seed={42 + r*1000})",
+                ha="center", va="center", fontsize=9, color=colors[r],
+                fontweight="bold")
+        ax.text(4.75, y - 0.25, f"{N_MODES}m / {N_PHOTONS}ph / UNBUNCHED",
+                ha="center", va="center", fontsize=7, color="#7f8c8d")
+
+        # Arrow from input
+        ax.annotate("", xy=(3.0, y), xytext=(1.5, 3.75),
+                    arrowprops=dict(arrowstyle="->", color="#7f8c8d", lw=1,
+                                   connectionstyle="arc3,rad=0.1"))
+
+        # LexGrouping box
+        lex_rect = plt.Rectangle((7.0, y - 0.35), 1.8, 0.7,
+                                   facecolor="#1abc9c", alpha=0.2,
+                                   edgecolor="#1abc9c", linewidth=1)
+        ax.add_patch(lex_rect)
+        ax.text(7.9, y, f"Lex({LEX_OUT})", ha="center", va="center",
+                fontsize=8, color="#1abc9c", fontweight="bold")
+
+        ax.annotate("", xy=(7.0, y), xytext=(6.5, y),
+                    arrowprops=dict(arrowstyle="->", color="#7f8c8d", lw=1))
+
+        # Arrow to concat
+        ax.annotate("", xy=(9.8, 3.75), xytext=(8.8, y),
+                    arrowprops=dict(arrowstyle="->", color="#7f8c8d", lw=1,
+                                   connectionstyle="arc3,rad=-0.1"))
+
+    # Concat + Raw
+    cat_rect = plt.Rectangle((9.5, 2.5), 2.5, 2.5,
+                               facecolor="#f39c12", alpha=0.2,
+                               edgecolor="#f39c12", linewidth=2)
+    ax.add_patch(cat_rect)
+    ax.text(10.75, 4.5, "Concatenate", ha="center", fontsize=11,
+            fontweight="bold", color="#f39c12")
+    ax.text(10.75, 3.8, f"Quantum: {LEX_OUT}×{N_RESERVOIRS}={LEX_OUT*N_RESERVOIRS}",
+            ha="center", fontsize=9, color="#2c3e50")
+    ax.text(10.75, 3.3, f"Raw PCA: {WINDOW*N_PCA}",
+            ha="center", fontsize=9, color="#2c3e50")
+    ax.text(10.75, 2.8, f"Total: {LEX_OUT*N_RESERVOIRS + WINDOW*N_PCA} dim",
+            ha="center", fontsize=9, fontweight="bold", color="#2c3e50")
+
+    # Raw skip connection
+    ax.annotate("", xy=(9.5, 3.0), xytext=(1.5, 3.0),
+                arrowprops=dict(arrowstyle="->", color="#3498db", lw=2,
+                                linestyle="--"))
+    ax.text(5.5, 2.6, "Raw PCA features (skip connection)",
+            ha="center", fontsize=8, color="#3498db", fontstyle="italic")
+
+    # Ridge output
+    ax.annotate("→ Ridge → 5 PCA → 224 prices",
+                xy=(12.0, 3.75), fontsize=11, color="#2c3e50",
+                fontweight="bold", va="center")
+
+    fig.tight_layout()
+    fig.savefig(out / "reservoir_ensemble.png", dpi=200, bbox_inches="tight",
+                facecolor="white", edgecolor="none")
+    plt.close(fig)
+
+    print("  Circuit visualizations complete!")
 
 
 if __name__ == "__main__":
@@ -391,42 +818,61 @@ if __name__ == "__main__":
     print("\nGenerating plots...")
     generate_plots(model, actual, predicted, features, TRAIN_DAYS, PRED_DAYS, out)
 
-    # Export Data for Website 3D Plotly Interaction
+    # Generate circuit visualizations
+    print("\nGenerating circuit visualizations...")
+    visualize_circuit(out)
+
+    # --- Web Data Exports ---
+    import json
     web_out = BASE / "qedi_website" / "assets" / "results_data.json"
-    
-    # Parse tenors and maturities from feature names for 3D axis
-    tenors = []
-    maturities = []
-    
-    # "Tenor : 0.5; Maturity : 1.0"
+    tenors_list = []
+    maturities_list = []
     for f in features:
         parts = f.split(";")
         t_str = parts[0].replace("Tenor :", "").strip()
         m_str = parts[1].replace("Maturity :", "").strip()
-        tenors.append(float(t_str))
-        maturities.append(float(m_str))
+        tenors_list.append(float(t_str))
+        maturities_list.append(float(m_str))
         
     export_dict = {
         "features": features,
-        "tenors": tenors,
-        "maturities": maturities,
+        "tenors": tenors_list,
+        "maturities": maturities_list,
         "actual": actual.tolist(),
         "predicted": predicted.tolist(),
         "pred_days": PRED_DAYS,
         "train_days": TRAIN_DAYS
     }
-    
     with open(web_out, "w") as f:
         json.dump(export_dict, f)
-        
-    # Export PCA 1 Time Series for Web Animation
+
     anim_out = BASE / "qedi_website" / "assets" / "pca_anim_data.json"
-    pc_slice_len = 200 # Animate the last 200 days of training
+    pc_slice_len = 200
     anim_dict = {
         "true_pc1": model["train_true_pca"][-pc_slice_len:, 0].tolist(),
         "pred_pc1": model["train_pred_pca"][-pc_slice_len:, 0].tolist()
     }
     with open(anim_out, "w") as f:
         json.dump(anim_dict, f)
+        
+    mae_out = BASE / "qedi_website" / "assets" / "mae_surface.json"
+    unique_tenors = sorted(list(set(tenors_list)))
+    unique_maturities = sorted(list(set(maturities_list)))
+    avg_surface_matrix = np.full((len(unique_tenors), len(unique_maturities)), np.nan)
+    avg_errs = np.mean(np.abs(actual - predicted), axis=0)
+    for fi, feat in enumerate(features):
+        t = tenors_list[fi]
+        m = maturities_list[fi]
+        avg_surface_matrix[unique_tenors.index(t), unique_maturities.index(m)] = avg_errs[fi]
+        
+    surface_list = [[None if np.isnan(v) else float(v) for v in row] for row in avg_surface_matrix]
+    
+    mae_dict = {
+        "tenors": unique_tenors,
+        "maturities": unique_maturities,
+        "surface": surface_list
+    }
+    with open(mae_out, "w") as f:
+        json.dump(mae_dict, f)
 
-    print(f"\nAll saved to {out}/, {web_out}, and {anim_out}")
+    print(f"\nAll saved to {out}/ and JSON outputs written.")

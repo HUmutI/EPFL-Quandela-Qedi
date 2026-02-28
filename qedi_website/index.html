@@ -15,7 +15,10 @@
     <!-- Hero Section -->
     <header class="hero" id="home">
         <div class="top-nav">
-            <div class="team-logo-text">TEAM <span>QEDI</span></div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="team-logo-text">TEAM <span>QEDI</span></div>
+                <img src="assets/qat_logo_white.png" alt="QAT Logo" style="height: 35px;">
+            </div>
             <div class="university-logos">
                 <div class="logo-box metu-logo">
                     <img src="assets/metu_logo.png" alt="METU Logo">
@@ -234,6 +237,15 @@
                         Animation</button>
                     <p class="caption">Animated tracking of Swaption Variance (PC1 axis): Actual Market Base vs QRC
                         Tracking Trajectory.</p>
+                </div>
+
+                <h3 style="text-align: center; color: var(--dark-slate); margin-bottom: 2rem;">Interactive 2D Mean
+                    Absolute Error (MAE) Surface Analysis</h3>
+                <div class="plot-box" style="margin-bottom: 4rem;">
+                    <div id="plot-mae-surface"
+                        style="height: 500px; width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                    </div>
+                    <p class="caption">Tenor vs Maturity Average MAE Grid over the 6-Day Inference Horizon.</p>
                 </div>
             </div>
 

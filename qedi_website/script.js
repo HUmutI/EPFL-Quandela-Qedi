@@ -526,4 +526,33 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(err => console.error("Error loading PCA animation data:", err));
     }
 
+    /* --- Interactive 2D MAE Surface Heatmap --- */
+    const plotMaeSurface = document.getElementById('plot-mae-surface');
+    if (plotMaeSurface) {
+        fetch('assets/mae_surface.json')
+            .then(response => response.json())
+            .then(data => {
+                const traceMae = {
+                    z: data.surface,
+                    x: data.maturities.map(m => m < 1 ? m.toFixed(2) : m.toFixed(1)),
+                    y: data.tenors.map(t => Number.isInteger(t) ? `${t}Y` : `${t}Y`),
+                    type: 'heatmap',
+                    colorscale: 'Plasma',
+                    colorbar: { title: "MAE" },
+                    hovertemplate: 'Maturity: %{x} Years<br>Tenor: %{y}<br>Mean Absolute Error: %{z:.5f}<extra></extra>'
+                };
+
+                const layoutMae = {
+                    margin: { l: 60, r: 20, b: 60, t: 40 },
+                    xaxis: { title: 'Maturity (years)' },
+                    yaxis: { title: 'Tenor (years)' },
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    plot_bgcolor: 'rgba(0,0,0,0)'
+                };
+
+                Plotly.newPlot('plot-mae-surface', [traceMae], layoutMae, { responsive: true });
+            })
+            .catch(err => console.error("Error loading MAE Surface data:", err));
+    }
+
 });
