@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Qedi | EPFL Quantum Hackathon 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Hero Section -->
+    <header class="hero" id="home">
+        <div class="top-nav">
+            <div class="team-logo-text">TEAM <span>QEDI</span></div>
+            <div class="logo-box metu-logo">
+                <img src="assets/metu_logo.png" alt="METU Logo">
+            </div>
+        </div>
+        <div class="hero-canvas-container">
+            <canvas id="hero-particles"></canvas>
+        </div>
+        <div class="hero-content">
+            <div class="subtitle">EPFL Quantum Hackathon &bull; Quandela Challenge</div>
+            <h1 class="main-title">Quantum Reservoir Computing</h1>
+            <h2 class="sub-title">Forecasting & Imputing Financial Markets</h2>
+
+            <div class="team-container">
+                <div class="team-members">
+                    <span>Eren Aslan</span>
+                    <span>Hüseyin Umut Işık</span>
+                    <span>Arda Kara</span>
+                    <span>Mehmet Alp Özaydın</span>
+                </div>
+            </div>
+
+            <a href="#challenge" class="btn-primary">Explore The Solution</a>
+        </div>
+    </header>
+
+    <!-- The Challenge Section -->
+    <section id="challenge" class="section bg-light">
+        <div class="container">
+            <div class="section-header">
+                <h2>01. The Challenge</h2>
+                <div class="divider"></div>
+            </div>
+            <div class="grid-2">
+                <div class="card card-red">
+                    <h3>Predictive Forecasting</h3>
+                    <p>Financial markets produce exceptionally non-linear, high-dimensional option structures. The
+                        challenge demands predicting the exact fractional pricing map of Day N+1 by understanding the
+                        market's hidden topological trends.</p>
+                </div>
+                <div class="card card-dark">
+                    <h3>Data Imputation</h3>
+                    <p>Real-world financial pipelines suffer from network outages and blank data points. The model must
+                        analytically construct internal tensor relationships to impute and reconstruct these missing
+                        days perfectly.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- The Sandbox Interactive -->
+    <section id="interactive" class="section bg-white">
+        <div class="container">
+            <div class="section-header">
+                <h2>02. Interactive Data Imputer</h2>
+                <div class="divider"></div>
+                <p>Try it yourself! Draw a jagged market volatility curve, <strong>leave some blank gaps</strong> (lift
+                    your mouse), and let the QRC Engine reconstruct the missing data points.</p>
+            </div>
+
+            <div class="sandbox-container">
+                <canvas id="draw-canvas"></canvas>
+                <div class="sandbox-controls">
+                    <button id="btn-clear" class="btn-secondary">Clear Market Data</button>
+                    <button id="btn-impute" class="btn-primary">Run Quantum Imputation (QRC)</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section id="architecture" class="section bg-light">
+        <div class="container">
+            <div class="section-header">
+                <h2>03. QRC Architecture</h2>
+                <div class="divider"></div>
+                <p>Why replace heavy LSTM networks with a minimalist Quantum Reservoir?</p>
+            </div>
+            <div class="grid-2 align-center">
+                <div class="text-block">
+                    <ul class="feature-list">
+                        <li>
+                            <span class="icon">01</span>
+                            <div>
+                                <h4>Dimensionality Compression</h4>
+                                <p>We map 224 continuous option prices into 6 latent topological dimensions using
+                                    classical PCA.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="icon">02</span>
+                            <div>
+                                <h4>Hilbert Space Reservoir</h4>
+                                <p>Data is injected via Rx/Ry rotations into an exponentially large quantum entanglement
+                                    loop, retaining long-term memory gracefully without suffering from vanishing
+                                    gradients.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="icon">03</span>
+                            <div>
+                                <h4>Ridge Regression Alignment</h4>
+                                <p>To efficiently extract patterns from the massive quantum state space, we apply Ridge
+                                    Regression to the measurements. This heavily mitigates noise and ensures highly
+                                    stable target approximations for predicting chaotic time series.
+                                    <a href="https://arxiv.org/pdf/2505.13933" target="_blank"
+                                        style="color: var(--epfl-red); text-decoration: none; font-weight: 600; font-size: 0.9em;">[Read
+                                        Paper]</a>
+                                </p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="icon">04</span>
+                            <div>
+                                <h4>Direct Linear Readout</h4>
+                                <p>By measuring Pauli-Z expectations, we train a purely linear output layer instantly,
+                                    drastically preventing the overfitting that plagues classical neural nets on
+                                    low-volatility datasets.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="visual-placeholder">
+                    <!-- CSS driven architecture animation -->
+                    <div class="qrc-anim">
+                        <div class="qrc-input">Data (Day N)</div>
+                        <div class="qrc-arrow">→</div>
+                        <div class="qrc-reservoir">
+                            <div class="qrc-node n1"></div>
+                            <div class="qrc-node n2"></div>
+                            <div class="qrc-node n3"></div>
+                            <div class="qrc-node n4"></div>
+                            <div class="qrc-node n5"></div>
+                            <div class="qrc-core">Entanglement</div>
+                        </div>
+                        <div class="qrc-arrow">→</div>
+                        <div class="qrc-output">Forecast (Day N+1)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section id="results" class="section bg-white">
+        <div class="container">
+            <div class="section-header">
+                <h2>04. Results vs Classical Baselines</h2>
+                <div class="divider"></div>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <h5>Classical LSTM</h5>
+                    <div class="score">0.0089</div>
+                    <p class="label">RMSE Error</p>
+                </div>
+                <div class="metric-card highlight">
+                    <h5>Team Qedi (Hybrid QNN)</h5>
+                    <div class="score">0.0083</div>
+                    <p class="label">RMSE Error</p>
+                    <div class="badge">Champion Model</div>
+                </div>
+                <div class="metric-card">
+                    <h5>Naive Baseline</h5>
+                    <div class="score">0.0049</div>
+                    <p class="label">RMSE Error</p>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-top: 4rem;">
+                <div class="plot-box">
+                    <img src="assets/Champion_Hybrid_QNN_learning_curve.png" alt="QNN Learning Curve">
+                    <p class="caption">Hybrid QNN Learning Convergence (200 Epochs)</p>
+                </div>
+                <div class="plot-box">
+                    <img src="assets/Champion_Hybrid_QNN_Price_Prediction.png" alt="Price Prediction Mapping">
+                    <p class="caption">Ground Truth vs QRC Market Prediction</p>
+                </div>
+            </div>
+
+            <div class="cascade-breakdown">
+                <h3>6-Day Cascading Error Envelope</h3>
+                <p>Auto-regressive future prediction accuracy breakdown (MAPE %)</p>
+                <div class="day-tracker">
+                    <div class="day-bar" style="height: 42%;"><span class="day-label">Day 1</span><span
+                            class="val">4.2%</span></div>
+                    <div class="day-bar" style="height: 53%;"><span class="day-label">Day 2</span><span
+                            class="val">5.3%</span></div>
+                    <div class="day-bar" style="height: 50%;"><span class="day-label">Day 3</span><span
+                            class="val">5.0%</span></div>
+                    <div class="day-bar" style="height: 58%;"><span class="day-label">Day 4</span><span
+                            class="val">5.8%</span></div>
+                    <div class="day-bar" style="height: 65%;"><span class="day-label">Day 5</span><span
+                            class="val">6.5%</span></div>
+                    <div class="day-bar" style="height: 72%;"><span class="day-label">Day 6</span><span
+                            class="val">7.2%</span></div>
+                    <div class="threshold-line"></div>
+                </div>
+                <p class="caption" style="text-align: center; margin-top: 1rem;">Maintains reliable sub-10% projection
+                    accuracy out to Day 6.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <h2>Team Qedi</h2>
+            <p>EPFL Quantum Hackathon 2026 &bull; Quandela Challenge</p>
+            <div class="footer-names">Eren Aslan &bull; Hüseyin Umut Işık &bull; Arda Kara &bull; Mehmet Alp Özaydın
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

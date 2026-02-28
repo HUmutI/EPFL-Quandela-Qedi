@@ -1,0 +1,79 @@
+{
+    "Hyperparameters": {
+        "WINDOW_SIZE": 5,
+        "EPOCHS": 200,
+        "BATCH_SIZE": 32,
+        "LR": 0.005,
+        "QNN_LAYERS": 5,
+        "LATENT_DIM": 6
+    },
+    "Results": [
+        {
+            "Model": "Naive Baseline (Tomorrow=Today)",
+            "MSE": 1.1076479252234047e-05,
+            "RMSE": 0.003328134500322072,
+            "MAE": 0.002455943734613666,
+            "R2_Score": 0.8907584696349939,
+            "MAPE_Percent": 1.3296391260096585,
+            "Accuracy_within_10_Percent_Margin": 100.0
+        },
+        {
+            "Model": "Classical LSTM",
+            "MSE": 5.2624701046701453e-05,
+            "RMSE": 0.007254288459022115,
+            "MAE": 0.005189069794904127,
+            "R2_Score": 0.4874040997159206,
+            "MAPE_Percent": 2.8539330040400945,
+            "Accuracy_within_10_Percent_Margin": 96.24155405405406
+        },
+        {
+            "Model": "Classical Random Forest",
+            "MSE": 2.3900141925025482e-05,
+            "RMSE": 0.004888777140044888,
+            "MAE": 0.003454979724577158,
+            "R2_Score": 0.7697949987627982,
+            "MAPE_Percent": 1.870993224863981,
+            "Accuracy_within_10_Percent_Margin": 99.88537644787645
+        },
+        {
+            "Model": "Champion Hybrid QNN",
+            "MSE": 6.851113763452431e-05,
+            "RMSE": 0.008277145500383831,
+            "MAE": 0.005890798489317056,
+            "R2_Score": 0.25417417872967346,
+            "MAPE_Percent": 3.339302913505852,
+            "Accuracy_within_10_Percent_Margin": 93.98527992277992
+        },
+        {
+            "6_Day_Forecast_Breakdown": {
+                "Day_1_RMSE": 0.008862066934401005,
+                "Day_1_MAPE": "4.21%",
+                "Day_1_Acc": "99.11%",
+                "Day_2_RMSE": 0.012013895205522353,
+                "Day_2_MAPE": "5.34%",
+                "Day_2_Acc": "91.52%",
+                "Day_3_RMSE": 0.011940174205537047,
+                "Day_3_MAPE": "5.02%",
+                "Day_3_Acc": "93.75%",
+                "Day_4_RMSE": 0.013941027999125962,
+                "Day_4_MAPE": "5.85%",
+                "Day_4_Acc": "77.68%",
+                "Day_5_RMSE": 0.015426976978515325,
+                "Day_5_MAPE": "6.55%",
+                "Day_5_Acc": "72.77%",
+                "Day_6_RMSE": 0.017197816027386865,
+                "Day_6_MAPE": "7.25%",
+                "Day_6_Acc": "63.84%"
+            }
+        },
+        {
+            "Model": "QSVR (Quantum Support Vector Regressor)",
+            "MSE": 0.0005432425184461439,
+            "RMSE": 0.023307563545899513,
+            "MAE": 0.018662670717070846,
+            "R2_Score": -4.095100888504256,
+            "MAPE_Percent": 10.014224273381556,
+            "Accuracy_within_10_Percent_Margin": 57.2574806949807
+        }
+    ]
+}
