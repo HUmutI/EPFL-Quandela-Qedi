@@ -266,4 +266,88 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    /* --- Interactive 3D Plotly Swaption Surfaces --- */
+    const plotActual = document.getElementById('plot-actual');
+    const plotPredicted = document.getElementById('plot-predicted');
+
+    if (plotActual && plotPredicted) {
+        fetch('assets/results_data.json')
+            .then(response => response.json())
+            .then(data => {
+                // Parse distinct Tenors and Maturities to build the grid
+                const uniqueTenors = [...new Set(data.tenors)].sort((a, b) => a - b);
+                const uniqueMaturities = [...new Set(data.maturities)].sort((a, b) => a - b);
+
+                // Helper function to build 2D Z-matrix from flattened 224D array
+                function buildZMatrix(dayIndex, sourceArray) {
+                    const row = sourceArray[dayIndex];
+                    let zMatrix = [];
+                    for (let t = 0; t < uniqueTenors.length; t++) {
+                        let zRow = [];
+                        for (let m = 0; m < uniqueMaturities.length; m++) {
+                            // Find the index in the flattened 224 array
+                            const flatIndex = data.tenors.findIndex((ten, idx) => ten === uniqueTenors[t] && data.maturities[idx] === uniqueMaturities[m]);
+                            zRow.push(flatIndex >= 0 ? row[flatIndex] : null);
+                        }
+                        zMatrix.push(zRow);
+                    }
+                    return zMatrix;
+                }
+
+                // Plotting Function
+                function drawPlots(day) {
+                    // Update buttons
+                    document.querySelectorAll('.btn-secondary').forEach(b => b.classList.remove('active'));
+                    document.getElementById(`btn-day${day}`).classList.add('active');
+
+                    // Array indexing (Day 1 -> index 0)
+                    const dayIndex = day - 1;
+                    const zActual = buildZMatrix(dayIndex, data.actual);
+                    const zPredicted = buildZMatrix(dayIndex, data.predicted);
+
+                    const layoutTemplate = {
+                        margin: { l: 0, r: 0, b: 0, t: 20 },
+                        scene: {
+                            xaxis: { title: 'Maturity (Years)', gridcolor: '#ddd' },
+                            yaxis: { title: 'Tenor (Years)', gridcolor: '#ddd' },
+                            zaxis: { title: 'Implied Volatility', gridcolor: '#ddd' },
+                            camera: { eye: { x: 1.5, y: 1.5, z: 0.5 } }
+                        },
+                        paper_bgcolor: 'rgba(0,0,0,0)',
+                        plot_bgcolor: 'rgba(0,0,0,0)'
+                    };
+
+                    const traceActual = {
+                        z: zActual,
+                        x: uniqueMaturities,
+                        y: uniqueTenors,
+                        type: 'surface',
+                        colorscale: 'Viridis',
+                        showscale: false
+                    };
+
+                    const tracePredicted = {
+                        z: zPredicted,
+                        x: uniqueMaturities,
+                        y: uniqueTenors,
+                        type: 'surface',
+                        colorscale: 'RdBu',
+                        showscale: false
+                    };
+
+                    Plotly.newPlot('plot-actual', [traceActual], Object.assign({}, layoutTemplate, { title: `Day ${day} Ground Truth` }), { responsive: true });
+                    Plotly.newPlot('plot-predicted', [tracePredicted], Object.assign({}, layoutTemplate, { title: `Day ${day} MerLin QRC Prediction` }), { responsive: true });
+                }
+
+                // Initial Draw
+                drawPlots(1);
+
+                // Button Listeners
+                document.getElementById('btn-day1').addEventListener('click', () => drawPlots(1));
+                document.getElementById('btn-day3').addEventListener('click', () => drawPlots(3));
+                document.getElementById('btn-day6').addEventListener('click', () => drawPlots(6));
+            })
+            .catch(err => console.error("Error loading plot data:", err));
+    }
+
 });

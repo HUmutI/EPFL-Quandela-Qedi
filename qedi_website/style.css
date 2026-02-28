@@ -118,6 +118,27 @@ h3 {
     overflow: hidden;
 }
 
+.btn-secondary {
+    display: inline-block;
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--dark-slate);
+    background-color: transparent;
+    border: 2px solid var(--dark-slate);
+    border-radius: 30px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover,
+.btn-secondary.active {
+    background-color: var(--dark-slate);
+    color: var(--white);
+    transform: scale(1.05);
+}
+
 /* Light sweep effect / glare across the button */
 .btn-primary::before {
     content: '';
