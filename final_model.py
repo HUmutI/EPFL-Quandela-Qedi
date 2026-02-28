@@ -418,5 +418,15 @@ if __name__ == "__main__":
     
     with open(web_out, "w") as f:
         json.dump(export_dict, f)
+        
+    # Export PCA 1 Time Series for Web Animation
+    anim_out = BASE / "qedi_website" / "assets" / "pca_anim_data.json"
+    pc_slice_len = 200 # Animate the last 200 days of training
+    anim_dict = {
+        "true_pc1": model["train_true_pca"][-pc_slice_len:, 0].tolist(),
+        "pred_pc1": model["train_pred_pca"][-pc_slice_len:, 0].tolist()
+    }
+    with open(anim_out, "w") as f:
+        json.dump(anim_dict, f)
 
-    print(f"\nAll saved to {out}/ and {web_out}")
+    print(f"\nAll saved to {out}/, {web_out}, and {anim_out}")

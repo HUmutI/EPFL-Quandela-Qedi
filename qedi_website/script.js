@@ -395,4 +395,86 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(err => console.error("Error loading plot data:", err));
     }
 
+    /* --- Animated PCA Trajectory Plot --- */
+    const plotPcaAnim = document.getElementById('plot-pca-anim');
+    const btnReplayAnim = document.getElementById('btn-replay-anim');
+
+    if (plotPcaAnim) {
+        fetch('assets/pca_anim_data.json')
+            .then(response => response.json())
+            .then(data => {
+                const totalPoints = data.true_pc1.length;
+                const xFrames = Array.from({ length: totalPoints }, (_, i) => i + 1);
+
+                // Initialize the base plot with full TRUE background and empty PRED
+                const traceTrue = {
+                    x: xFrames,
+                    y: data.true_pc1,
+                    mode: 'lines',
+                    name: 'Market Reality (Target)',
+                    line: { color: 'rgba(68, 68, 68, 0.4)', width: 3 } // Dark slate, faded background
+                };
+
+                const tracePred = {
+                    x: [xFrames[0]],
+                    y: [data.pred_pc1[0]],
+                    mode: 'lines',
+                    name: 'MerLin Tracking',
+                    line: { color: 'rgba(227, 0, 15, 1)', width: 3 } // EPFL red
+                };
+
+                const layout = {
+                    margin: { l: 60, r: 20, b: 60, t: 40 },
+                    xaxis: { title: 'Time (Days)', range: [0, totalPoints + 5] },
+                    yaxis: {
+                        title: 'Principal Component 1 (Swaption Variance)',
+                        range: [
+                            Math.min(...data.true_pc1, ...data.pred_pc1) - 1,
+                            Math.max(...data.true_pc1, ...data.pred_pc1) + 1
+                        ]
+                    },
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    hovermode: 'x unified',
+                    showlegend: true,
+                    legend: { orientation: 'h', x: 0.5, y: 1.1, xanchor: 'center' }
+                };
+
+                Plotly.newPlot('plot-pca-anim', [traceTrue, tracePred], layout, { responsive: true });
+
+                // Animation Engine
+                let animReq;
+                function runAnimation() {
+                    // Reset
+                    cancelAnimationFrame(animReq);
+                    Plotly.update('plot-pca-anim', { x: [xFrames, [xFrames[0]]], y: [data.true_pc1, [data.pred_pc1[0]]] });
+
+                    let frameIdx = 1;
+                    function animateStep() {
+                        const stepSize = 3; // Draw 3 days per frame to make it fast and smooth
+                        frameIdx += stepSize;
+                        if (frameIdx >= totalPoints) frameIdx = totalPoints - 1;
+
+                        Plotly.update('plot-pca-anim', {
+                            x: [xFrames, xFrames.slice(0, frameIdx)],
+                            y: [data.true_pc1, data.pred_pc1.slice(0, frameIdx)]
+                        }, {}, [0, 1]);
+
+                        if (frameIdx < totalPoints - 1) {
+                            animReq = requestAnimationFrame(animateStep);
+                        }
+                    }
+                    animReq = requestAnimationFrame(animateStep);
+                }
+
+                // Autoplay once loaded
+                setTimeout(runAnimation, 500);
+
+                if (btnReplayAnim) {
+                    btnReplayAnim.addEventListener('click', runAnimation);
+                }
+            })
+            .catch(err => console.error("Error loading PCA animation data:", err));
+    }
+
 });
