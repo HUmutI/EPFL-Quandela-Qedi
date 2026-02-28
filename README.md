@@ -14,7 +14,7 @@ A **swaption volatility surface** is a 2-dimensional grid of implied volatilitie
 
 The surfaces are high-dimensional (224 features) but lie on a low-dimensional manifold: adjacent points are strongly correlated, and day-to-day changes are smooth. 
 
-**The Quantum Solution:** We compress the manifold via PCA and process the temporal dynamics using a **Quantum Reservoir Computer (QRC)**. Our specific reservoir is **[MerLin by Quandela](https://merlinquantum.ai/)** — a photonic quantum circuit whose measurement statistics provide robust nonlinear features, entirely bypassing the vanishing gradients that ruin classical LSTMs.
+**The Quantum Solution:** We compress the manifold via PCA and process the temporal dynamics using a **Quantum Reservoir Computer (QRC)**. Our specific reservoir is **[MerLin by Quandela](https://merlinquantum.ai/)** — a photonic quantum circuit whose measurement statistics provide robust nonlinear features, entirely bypassing the vanishing gradients that ruin classical LSTMs..
 
 ---
 
