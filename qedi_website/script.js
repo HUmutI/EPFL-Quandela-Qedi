@@ -547,11 +547,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     margin: { l: 60, r: 20, b: 60, t: 40 },
                     xaxis: {
                         title: 'Maturity (years)',
-                        tickangle: -45
+                        tickangle: -45,
+                        type: 'category'
                     },
                     yaxis: {
                         title: 'Tenor (years)',
-                        autorange: true
+                        autorange: true,
+                        type: 'category'
                     },
                     paper_bgcolor: 'rgba(0,0,0,0)',
                     plot_bgcolor: 'rgba(0,0,0,0)'
