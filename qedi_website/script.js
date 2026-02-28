@@ -539,6 +539,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     type: 'heatmap',
                     colorscale: 'Plasma',
                     zmin: 0, // strict 0 minimum for absolute error scaling
+                    zsmooth: 'best', // exactly mimics interpolation="bilinear" from python
                     colorbar: { title: "MAE" },
                     hovertemplate: 'Maturity: %{x} Years<br>Tenor: %{y}<br>Mean Absolute Error: %{z:.5f}<extra></extra>'
                 };
