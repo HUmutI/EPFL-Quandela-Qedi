@@ -406,21 +406,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 const totalPoints = data.true_pc1.length;
                 const xFrames = Array.from({ length: totalPoints }, (_, i) => i + 1);
 
-                // Initialize the base plot with full TRUE background and empty PRED
+                const halfIdx = Math.floor(totalPoints / 2);
+
+                // Initialize the base plot
                 const traceTrue = {
                     x: xFrames,
                     y: data.true_pc1,
                     mode: 'lines',
                     name: 'Market Reality (Target)',
-                    line: { color: 'rgba(68, 68, 68, 0.4)', width: 3 } // Dark slate, faded background
+                    line: { color: 'rgba(68, 68, 68, 0.4)', width: 3 } // Dark slate
                 };
 
-                const tracePred = {
-                    x: [xFrames[0]],
-                    y: [data.pred_pc1[0]],
+                const tracePredStatic = {
+                    x: xFrames.slice(0, halfIdx),
+                    y: data.pred_pc1.slice(0, halfIdx),
                     mode: 'lines',
-                    name: 'MerLin Tracking',
+                    name: 'Historical Track (Red)',
                     line: { color: 'rgba(227, 0, 15, 1)', width: 3 } // EPFL red
+                };
+
+                const tracePredAnim = {
+                    x: [xFrames[halfIdx - 1]],
+                    y: [data.pred_pc1[halfIdx - 1]],
+                    mode: 'lines',
+                    name: 'Future QRC Projection (6-day chunks)',
+                    line: { color: 'rgba(46, 204, 113, 1)', width: 3 } // Green
                 };
 
                 const layout = {
@@ -440,33 +450,39 @@ document.addEventListener('DOMContentLoaded', () => {
                     legend: { orientation: 'h', x: 0.5, y: 1.1, xanchor: 'center' }
                 };
 
-                Plotly.newPlot('plot-pca-anim', [traceTrue, tracePred], layout, { responsive: true });
+                Plotly.newPlot('plot-pca-anim', [traceTrue, tracePredStatic, tracePredAnim], layout, { responsive: true });
 
                 // Animation Engine
                 let animReq;
                 function runAnimation() {
-                    // Reset
                     cancelAnimationFrame(animReq);
-                    Plotly.update('plot-pca-anim', { x: [xFrames, [xFrames[0]]], y: [data.true_pc1, [data.pred_pc1[0]]] });
+                    // Reset to initial state
+                    Plotly.update('plot-pca-anim', {
+                        x: [xFrames, xFrames.slice(0, halfIdx), [xFrames[halfIdx - 1]]],
+                        y: [data.true_pc1, data.pred_pc1.slice(0, halfIdx), [data.pred_pc1[halfIdx - 1]]]
+                    }, {}, [0, 1, 2]);
 
-                    let frameIdx = 1;
+                    let frameIdx = halfIdx - 1;
                     function animateStep() {
-                        const stepSize = 1; // 1 day per frame = ~3-4x slower
+                        const stepSize = 6; // Draw 6 days per frame sequentially
                         frameIdx += stepSize;
                         if (frameIdx >= totalPoints) frameIdx = totalPoints - 1;
 
                         Plotly.update('plot-pca-anim', {
-                            x: [xFrames, xFrames.slice(0, frameIdx)],
-                            y: [data.true_pc1, data.pred_pc1.slice(0, frameIdx)]
-                        }, {}, [0, 1]);
+                            x: [xFrames, xFrames.slice(0, halfIdx), xFrames.slice(halfIdx - 1, frameIdx + 1)],
+                            y: [data.true_pc1, data.pred_pc1.slice(0, halfIdx), data.pred_pc1.slice(halfIdx - 1, frameIdx + 1)]
+                        }, {}, [0, 1, 2]);
 
                         if (frameIdx < totalPoints - 1) {
                             setTimeout(() => {
                                 animReq = requestAnimationFrame(animateStep);
-                            }, 10); // Adds a slight delay to ensure it stays consistently slow
+                            }, 400); // Very clear distinct 6-day hops
                         }
                     }
-                    animReq = requestAnimationFrame(animateStep);
+                    // Start the 6-day chunk animation
+                    setTimeout(() => {
+                        animReq = requestAnimationFrame(animateStep);
+                    }, 500); // Brief pause before animation begins
                 }
 
                 // Autoplay once loaded
