@@ -451,7 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     let frameIdx = 1;
                     function animateStep() {
-                        const stepSize = 3; // Draw 3 days per frame to make it fast and smooth
+                        const stepSize = 1; // 1 day per frame = ~3-4x slower
                         frameIdx += stepSize;
                         if (frameIdx >= totalPoints) frameIdx = totalPoints - 1;
 
@@ -461,7 +461,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         }, {}, [0, 1]);
 
                         if (frameIdx < totalPoints - 1) {
-                            animReq = requestAnimationFrame(animateStep);
+                            setTimeout(() => {
+                                animReq = requestAnimationFrame(animateStep);
+                            }, 10); // Adds a slight delay to ensure it stays consistently slow
                         }
                     }
                     animReq = requestAnimationFrame(animateStep);
