@@ -532,20 +532,36 @@ document.addEventListener('DOMContentLoaded', () => {
         fetch('assets/mae_surface.json')
             .then(response => response.json())
             .then(data => {
+                // Build a 2D array of formatted strings for the text labels
+                // We truncate to 4 decimals to match the python plot's "val:.4f"
+                const textLabels = data.surface.map(row =>
+                    row.map(val => val === null || isNaN(val) ? "" : val.toFixed(4))
+                );
+
                 const traceMae = {
                     z: data.surface,
                     x: data.maturities.map(m => m < 1 ? m.toFixed(2) : m.toFixed(1)),
-                    y: data.tenors.map(t => Number.isInteger(t) ? `${t}Y` : `${t}Y`),
+                    y: data.tenors.map(t => t + 'Y'),
+                    text: textLabels,
+                    texttemplate: "%{text}",
+                    textfont: { size: 9 }, // small font to fit inside pixels
                     type: 'heatmap',
                     colorscale: 'Plasma',
+                    zmin: 0, // strict 0 minimum for absolute error scaling
                     colorbar: { title: "MAE" },
                     hovertemplate: 'Maturity: %{x} Years<br>Tenor: %{y}<br>Mean Absolute Error: %{z:.5f}<extra></extra>'
                 };
 
                 const layoutMae = {
                     margin: { l: 60, r: 20, b: 60, t: 40 },
-                    xaxis: { title: 'Maturity (years)' },
-                    yaxis: { title: 'Tenor (years)' },
+                    xaxis: {
+                        title: 'Maturity (years)',
+                        tickangle: -45
+                    },
+                    yaxis: {
+                        title: 'Tenor (years)',
+                        autorange: true
+                    },
                     paper_bgcolor: 'rgba(0,0,0,0)',
                     plot_bgcolor: 'rgba(0,0,0,0)'
                 };
