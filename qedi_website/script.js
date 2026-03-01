@@ -554,12 +554,11 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleImputerBtn.addEventListener('click', () => {
             if (imputerContent.style.display === 'none') {
                 imputerContent.style.display = 'block';
-                toggleImputerBtn.textContent = 'Hide Interactive Data Imputer';
-                toggleImputerBtn.classList.replace('btn-primary', 'btn-secondary');
+                setTimeout(() => {
+                    imputerContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
             } else {
                 imputerContent.style.display = 'none';
-                toggleImputerBtn.textContent = 'Try the Interactive Data Imputer';
-                toggleImputerBtn.classList.replace('btn-secondary', 'btn-primary');
             }
         });
     }
