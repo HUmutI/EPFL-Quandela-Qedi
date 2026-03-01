@@ -94,13 +94,17 @@ Proudly built during the 48-hour **EPFL Quantum Hackathon 2026**.
 * **Mehmet Alp Özaydın** 
 
 <br/>
-<div align="center" style="display: flex; justify-content: center; gap: 40px; align-items: center;">
-  <div>
-    <img src="qedi_website/assets/metu_logo.png" alt="METU Logo" width="120"/>
-    <p><i>Middle East Technical University</i></p>
-  </div>
-  <div>
-    <img src="qedi_website/assets/bilkent_logo.png" alt="Bilkent Logo" width="120"/>
-    <p><i>Bilkent University</i></p>
-  </div>
+<div align="center">
+  <table>
+    <tr align="center">
+      <td width="300" style="border: none; background: transparent;">
+        <img src="qedi_website/assets/metu_logo.png" alt="METU Logo" width="120"/><br>
+        <i>Middle East Technical University</i>
+      </td>
+      <td width="300" style="border: none; background: transparent;">
+        <img src="qedi_website/assets/bilkent_logo.png" alt="Bilkent Logo" width="120"/><br>
+        <i>Bilkent University</i>
+      </td>
+    </tr>
+  </table>
 </div>
