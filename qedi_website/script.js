@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
             img.addEventListener('click', () => {
                 lightbox.classList.add('show');
                 lightboxImg.src = img.src;
-                lightboxCaption.innerText = img.nextElementSibling.innerText;
+                lightboxCaption.textContent = img.nextElementSibling.textContent;
             });
         });
 
