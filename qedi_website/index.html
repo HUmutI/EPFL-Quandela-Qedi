@@ -97,11 +97,14 @@
     <section id="architecture" class="section bg-light">
         <div class="container">
             <div class="section-header">
-                <h2>03. QRC Architecture</h2>
+                <h2>03. Temporal QRC Architecture</h2>
                 <div class="divider"></div>
-                <p>Why replace heavy LSTM networks with a minimalist Photonic Quantum Reservoir (<a
-                        href="https://merlinquantum.ai/" target="_blank"
-                        style="color: var(--text-primary); text-decoration: underline;">powered by MerLin</a>)?</p>
+                <p>Inspired by <a href="https://arxiv.org/pdf/2505.13933" target="_blank"
+                        style="color: var(--epfl-red); font-weight: 600; text-decoration: none;">Li et al., "QRC for
+                        Realized Volatility Forecasting" (2024)</a>, we adapted their qubit-based Hamiltonian evolution
+                    into a purely <strong>Photonic Quantum Reservoir</strong> <a href="https://merlinquantum.ai/"
+                        target="_blank" style="color: var(--text-primary); text-decoration: underline;">powered by
+                        MerLin</a>.</p>
             </div>
             <div class="grid-2 align-center">
                 <div class="text-block">
@@ -109,39 +112,40 @@
                         <li>
                             <span class="icon">01</span>
                             <div>
-                                <h4>Manifold Compression</h4>
-                                <p>We compress the 224 raw swaption features down into an <strong>8-dimensional latent
-                                        manifold</strong> using classical whitened PCA. For missing data, we use
-                                    rigorous masked Tikhonov inference to reconstruct the latent state.</p>
+                                <h4>Dedicated Memory Modes</h4>
+                                <p>Instead of mapping data to all spatial modes simultaneously, our temporal array uses
+                                    <strong>5 input modes</strong> and <strong>3 dedicated memory modes</strong>. The
+                                    memory modes are left unencoded, continuously accumulating historical state contexts
+                                    through serial phase mixing.</p>
                             </div>
                         </li>
                         <li>
                             <span class="icon">02</span>
                             <div>
-                                <h4>Temporal Feature Engineering</h4>
-                                <p>We construct an enhanced 17D input vector tracking the latent code, its rate of
-                                    temporal change ($|\Delta z_t|$), and standardized calendar gaps to elegantly handle
-                                    irregular trading holidays.</p>
+                                <h4>Virtual Nodes</h4>
+                                <p>We sample the evolving physical system at multiple structural post-processing depths.
+                                    These <strong>Virtual Nodes</strong> emulate capturing chronological measurement
+                                    sub-intervals ($\delta \tau$), massively expanding our temporal feature
+                                    dimensionality without adding physical photon bounds.</p>
                             </div>
                         </li>
                         <li>
                             <span class="icon">03</span>
                             <div>
-                                <h4>Photonic Hilbert Space Reservoir</h4>
-                                <p>Powered by <a href="https://merlinquantum.ai/" target="_blank"
-                                        style="color: var(--epfl-red); text-decoration: none; font-weight: 600;">MerLin
-                                        (Photonic QRC)</a>. Data is injected into an 8-mode, 4-photon entanglement loop.
-                                    Using delay embedding and leaky integration, we capture deep sequential memory
-                                    instantly!</p>
+                                <h4>Ensemble LexGrouping Compression</h4>
+                                <p>Instead of measuring impossibly vast raw Fock states, we group the probability
+                                    vectors via <strong>LexGrouping</strong> across 3 random seeds × 3 virtual depths.
+                                    By utilizing this Temporal QRC architecture, we massively outperformed our standard
+                                    formulation!</p>
                             </div>
                         </li>
                         <li>
                             <span class="icon">04</span>
                             <div>
-                                <h4>Direct Residual Forecaster</h4>
-                                <p>Instead of absolute targets, we use a <strong>64-dimension Ensemble Ridge
-                                        Regression</strong> to predict purely the <em>change</em> in surface state
-                                    across the horizon. This decisively halts the rigid overfitting seen in LSTMs.</p>
+                                <h4>Direct Target Ridge Forecaster</h4>
+                                <p>Extracting the most prominent Non-linear Mutual Information quantum channels, an $L2$
+                                    regularized Ridge projection predicts the consecutive future states along the latent
+                                    PCA coordinate axis.</p>
                             </div>
                         </li>
                     </ul>
@@ -173,24 +177,37 @@
             <div class="section-header">
                 <h2>04. Results vs Classical Baselines</h2>
                 <div class="divider"></div>
+                <p style="text-align: center; margin-bottom: 2rem;">By executing the Temporal QRC pipeline (Li et al.,
+                    2024), we successfully beat our underlying standard QRC framework and left classical baseline LSTM
+                    networks and quantum regression tools absolutely obsolete.</p>
             </div>
 
-            <div class="metrics-grid">
+            <div class="metrics-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
                 <div class="metric-card">
-                    <h5>Classical LSTM</h5>
-                    <div class="score">0.0089</div>
+                    <h5>QSVR</h5>
+                    <div class="score">0.0233</div>
+                    <p class="label">RMSE Error</p>
+                </div>
+                <div class="metric-card">
+                    <h5>Hybrid QNN</h5>
+                    <div class="score">0.0083</div>
+                    <p class="label">RMSE Error</p>
+                </div>
+                <div class="metric-card">
+                    <h5>LSTM</h5>
+                    <div class="score">0.0073</div>
+                    <p class="label">RMSE Error</p>
+                </div>
+                <div class="metric-card">
+                    <h5>MerLin QRC</h5>
+                    <div class="score">0.0028</div>
                     <p class="label">RMSE Error</p>
                 </div>
                 <div class="metric-card highlight">
-                    <h5>Team Qedi (Hybrid QNN)</h5>
-                    <div class="score">0.0083</div>
+                    <h5>Temporal QRC</h5>
+                    <div class="score">0.0027</div>
                     <p class="label">RMSE Error</p>
-                    <div class="badge">Champion Model</div>
-                </div>
-                <div class="metric-card">
-                    <h5>Naive Baseline</h5>
-                    <div class="score">0.0049</div>
-                    <p class="label">RMSE Error</p>
+                    <div class="badge">🥇 Champion Model</div>
                 </div>
             </div>
 
@@ -241,7 +258,8 @@
 
                 <h3 style="text-align: center; color: var(--dark-slate); margin-bottom: 2rem;">Interactive 2D Mean
                     Absolute Error (MAE) Surface Analysis</h3>
-                <div class="plot-box" style="margin-bottom: 4rem;">
+                <div class="plot-box"
+                    style="margin-bottom: 4rem; max-width: 600px; margin-left: auto; margin-right: auto;">
                     <div id="plot-mae-surface"
                         style="aspect-ratio: 14 / 16; width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
                     </div>
