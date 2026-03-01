@@ -17,7 +17,7 @@ A **swaption volatility surface** is a 2D grid indexed by tenor and maturity. Pr
 
 ---
 
-## ⚙️ 3. Photonic Temporal QRC Architecture
+## ⚙️ 2. Photonic Temporal QRC Architecture
 
 Instead of a standard QRC, we implemented a state-of-the-art **PT-QRC pipeline**:
 
@@ -29,7 +29,7 @@ Instead of a standard QRC, we implemented a state-of-the-art **PT-QRC pipeline**
 
 ---
 
-## 🚀 4. CLI Reference & Setup
+## 🚀 3. CLI Reference & Setup
 
 Requires `torch`, `pennylane`, and standard ML arrays (`numpy`, `pandas`, `scikit-learn`).
 
@@ -52,7 +52,7 @@ python -m src.main predict --output artifacts/submission.xlsx
 
 ---
 
-## 📈 5. Final Benchmark Results
+## 📈 4. Final Benchmark Results
 
 By executing the novel Photonic Temporal QRC pipeline, we successfully beat our underlying standard QRC framework and left classical baselines absolutely obsolete.
 
@@ -61,8 +61,9 @@ By executing the novel Photonic Temporal QRC pipeline, we successfully beat our 
 | **QSVR** | `0.0233` | 
 | **Hybrid QNN** | `0.0083` | 
 | **LSTM** | `0.0073` | 
-| **Photonic Linear QRC** | `0.0028` | 
-| **🥇 Photonic Temporal QRC (PT-QRC)** | **`0.0027`** | 
+| **Photonic Linear QRC** | `0.0065` | 
+| **Hybrid Photonic Linear QRC** | `0.0028` | 
+| **🥇 Hybrid Photonic Temporal QRC (PT-QRC)** | **`0.0027`** | 
 
 *Maintains incredibly reliable sub-10% projection accuracy out to a 6-Day cascading prediction envelope.*
 

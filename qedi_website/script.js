@@ -496,13 +496,14 @@ document.addEventListener('DOMContentLoaded', () => {
             'QSVR (Quantum SVR)',
             'Hybrid QNN',
             'Photonic Linear QRC',
-            '<b>🥇 Photonic Temporal QRC</b>'
+            'Hybrid Photonic Linear QRC',
+            '<b>🥇 Hybrid Photonic Temporal QRC</b>'
         ];
 
         // Data populated from experiment_logs.json + final_model.py + temporal_qrc.py outputs
-        const mses = ['5.26e-05', '5.43e-04', '6.85e-05', '7.70e-06', '<b>7.58e-06</b>'];
-        const rses = ['0.00725', '0.02330', '0.00827', '0.00277', '<b>0.00275</b>']; // RMSE = sqrt(MSE)
-        const maes = ['0.00518', '0.01866', '0.00589', '0.00214', '<b>0.00195</b>']; // Temporal QRC MAE average
+        const mses = ['5.26e-05', '5.43e-04', '6.85e-05', '4.22e-05', '7.70e-06', '<b>7.58e-06</b>'];
+        const rses = ['0.00725', '0.02330', '0.00827', '0.00650', '0.00277', '<b>0.00275</b>']; // RMSE = sqrt(MSE)
+        const maes = ['0.00518', '0.01866', '0.00589', '0.00450', '0.00214', '<b>0.00195</b>']; // Temporal QRC MAE average
 
         const traceTable = {
             type: 'table',
@@ -525,11 +526,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 line: { color: "#e2e8f0", width: 1 },
                 fill: {
                     color: [
-                        // Column colors (rows 1-4: light grey, row 5: green highlight)
-                        ['#f8fafc', '#f8fafc', '#f8fafc', '#f8fafc', 'rgba(46, 204, 113, 0.15)'], // Col 1
-                        ['#f8fafc', '#f8fafc', '#f8fafc', '#f8fafc', 'rgba(46, 204, 113, 0.15)'], // Col 2
-                        ['#f8fafc', '#f8fafc', '#f8fafc', '#f8fafc', 'rgba(46, 204, 113, 0.15)'], // Col 3
-                        ['#f8fafc', '#f8fafc', '#f8fafc', '#f8fafc', 'rgba(46, 204, 113, 0.15)'], // Col 4
+                        // Column colors (rows 1-5: light grey, row 6: green highlight)
+                        ['#f8fafc', '#f8fafc', '#f8fafc', '#f8fafc', '#f8fafc', 'rgba(46, 204, 113, 0.15)'], // Col 1
+                        ['#f8fafc', '#f8fafc', '#f8fafc', '#f8fafc', '#f8fafc', 'rgba(46, 204, 113, 0.15)'], // Col 2
+                        ['#f8fafc', '#f8fafc', '#f8fafc', '#f8fafc', '#f8fafc', 'rgba(46, 204, 113, 0.15)'], // Col 3
+                        ['#f8fafc', '#f8fafc', '#f8fafc', '#f8fafc', '#f8fafc', 'rgba(46, 204, 113, 0.15)'], // Col 4
                     ]
                 },
                 font: { family: "Inter, sans-serif", size: 15, color: "#0f172a" },

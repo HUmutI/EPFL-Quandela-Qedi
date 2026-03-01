@@ -82,7 +82,7 @@
     <section id="architecture" class="section bg-light">
         <div class="container">
             <div class="section-header">
-                <h2>03. Photonic Temporal QRC Architecture</h2>
+                <h2>02. Photonic Temporal QRC Architecture</h2>
                 <div class="divider"></div>
                 <p>Inspired by <a href="https://arxiv.org/pdf/2505.13933" target="_blank"
                         style="color: var(--epfl-red); font-weight: 600; text-decoration: none;">Li et al., "QRC for
@@ -193,7 +193,8 @@
                             <p>Extracting the most prominent Non-linear Mutual Information quantum channels, an
                                 <i>L2</i>
                                 regularized Ridge projection predicts the consecutive future states along the latent
-                                PCA coordinate axis.</p>
+                                PCA coordinate axis.
+                            </p>
                         </div>
                     </li>
                 </ul>
@@ -217,7 +218,7 @@
     <section id="results" class="section bg-white">
         <div class="container">
             <div class="section-header">
-                <h2>04. Results vs Classical Baselines</h2>
+                <h2>03. Results vs Classical Baselines</h2>
                 <div class="divider"></div>
                 <p style="text-align: center; margin-bottom: 2rem;">By executing the Photonic Temporal QRC pipeline (Li
                     et al.,
@@ -225,7 +226,7 @@
                     networks and quantum regression tools absolutely obsolete.</p>
             </div>
 
-            <div class="metrics-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+            <div class="metrics-grid" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));">
                 <div class="metric-card">
                     <h5>QSVR</h5>
                     <div class="score">0.0233</div>
@@ -243,11 +244,16 @@
                 </div>
                 <div class="metric-card">
                     <h5>Photonic Linear QRC</h5>
+                    <div class="score">0.0065</div>
+                    <p class="label">RMSE Error</p>
+                </div>
+                <div class="metric-card">
+                    <h5>Hybrid Photonic Linear QRC</h5>
                     <div class="score">0.0028</div>
                     <p class="label">RMSE Error</p>
                 </div>
                 <div class="metric-card highlight">
-                    <h5>Photonic Temporal QRC</h5>
+                    <h5>Hybrid Photonic Temporal QRC</h5>
                     <div class="score">0.0027</div>
                     <p class="label">RMSE Error</p>
                     <div class="badge">🥇 Champion Model</div>
