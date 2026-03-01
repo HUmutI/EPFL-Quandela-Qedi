@@ -206,12 +206,11 @@ h3 {
 }
 
 .team-logo-text {
-    font-size: 5.2rem;
-    font-weight: 2000;
+    font-size: 3.2rem;
+    font-weight: 600;
     color: var(--white);
     letter-spacing: 2px;
     text-transform: uppercase;
-    height: 100px;
 }
 
 .team-logo-text span {
