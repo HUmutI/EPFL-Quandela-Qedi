@@ -1,6 +1,80 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    /* --- Hero Particle Reservoir Animation --- */
+    /* --- Challenge Visualizations --- */
+    const impGrid = document.getElementById('imputation-grid');
+    const foreGrid = document.getElementById('forecast-grid');
+
+    if (impGrid && foreGrid) {
+        // Setup grids 7x7
+        const gridSize = 49;
+
+        // Imputation setup
+        for (let i = 0; i < gridSize; i++) {
+            const cell = document.createElement('div');
+            cell.classList.add('challenge-cell');
+
+            // Randomly carve out missing data blocks (e.g. 20% missing)
+            if (Math.random() > 0.7) {
+                cell.classList.add('missing-target');
+                cell.classList.add('missing');
+            } else {
+                cell.style.opacity = 0.4 + Math.random() * 0.6;
+            }
+            impGrid.appendChild(cell);
+        }
+
+        // Forecasting setup
+        for (let i = 0; i < gridSize; i++) {
+            const cell = document.createElement('div');
+            cell.classList.add('challenge-cell');
+
+            // Right-most 2 columns represent the "future" horizon H
+            if (i % 7 >= 5) {
+                cell.classList.add('future-target');
+                cell.classList.add('future');
+            } else {
+                cell.style.opacity = 0.4 + Math.random() * 0.6;
+            }
+            foreGrid.appendChild(cell);
+        }
+
+        // Animation Loop
+        setInterval(() => {
+            // Imputation cycle
+            const missingCells = impGrid.querySelectorAll('.missing-target');
+            if (missingCells.length > 0) {
+                let isReconstructed = missingCells[0].classList.contains('reconstructed');
+
+                missingCells.forEach(c => {
+                    if (isReconstructed) {
+                        c.classList.remove('reconstructed');
+                        c.classList.add('missing');
+                    } else {
+                        c.classList.remove('missing');
+                        c.classList.add('reconstructed');
+                    }
+                });
+            }
+
+            // Forecasting cycle
+            const futureCells = foreGrid.querySelectorAll('.future-target');
+            if (futureCells.length > 0) {
+                let isPredicted = futureCells[0].classList.contains('predicting');
+
+                futureCells.forEach((c, idx) => {
+                    if (isPredicted) {
+                        c.classList.remove('predicting');
+                        c.style.animationDelay = '0s';
+                    } else {
+                        // Stagger the prediction forward along the column index smoothly
+                        const col = idx % 2;
+                        c.style.animationDelay = `${col * 0.4}s`;
+                        c.classList.add('predicting');
+                    }
+                });
+            }
+        }, 3000); // Trigger cycles every 3 seconds to let anims play out
+    }    /* --- Hero Particle Reservoir Animation --- */
     const heroCanvas = document.getElementById('hero-particles');
     if (heroCanvas) {
         const ctx = heroCanvas.getContext('2d');

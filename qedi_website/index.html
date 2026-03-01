@@ -73,6 +73,30 @@
                 <h2>01. The Challenge</h2>
                 <div class="divider"></div>
             </div>
+
+            <!-- Challenge Visualizations -->
+            <div class="challenge-vis-container"
+                style="margin-top: 3rem; margin-bottom: 4rem; display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap;">
+
+                <!-- Vis 1: Forecasting -->
+                <div class="vis-box"
+                    style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 400px; border: 1px solid var(--border-color); text-align: center;">
+                    <h4>Task 1: Predictive Forecasting</h4>
+                    <p style="font-size: 0.85rem; color: #666; margin-bottom: 2rem;">Predicting the next <i>H</i> day
+                        volatility surface topologies.</p>
+                    <div id="forecast-grid" class="challenge-grid"></div>
+                </div>
+
+                <!-- Vis 2: Imputation -->
+                <div class="vis-box"
+                    style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 400px; border: 1px solid var(--border-color); text-align: center;">
+                    <h4>Task 2: Data Imputation</h4>
+                    <p style="font-size: 0.85rem; color: #666; margin-bottom: 2rem;">Reconstructing missing Option Price
+                        nodes in the 2D surface grid.</p>
+                    <div id="imputation-grid" class="challenge-grid"></div>
+                </div>
+
+            </div>
             <div class="grid-2">
                 <div class="card card-red">
                     <h3>Predictive Forecasting</h3>
