@@ -516,8 +516,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 align: "center",
                 line: { width: 1, color: '#e2e8f0' },
                 fill: { color: "#1e293b" }, // Dark Slate background
-                font: { family: "Inter, sans-serif", size: 14, color: "white" },
-                height: 40
+                font: { family: "Inter, sans-serif", size: 16, color: "white" },
+                height: 50
             },
             cells: {
                 values: [rowLabels, mses, rses, maes],
@@ -532,8 +532,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         ['#f8fafc', '#f8fafc', '#f8fafc', '#f8fafc', 'rgba(46, 204, 113, 0.15)'], // Col 4
                     ]
                 },
-                font: { family: "Inter, sans-serif", size: 13, color: "#0f172a" },
-                height: 35
+                font: { family: "Inter, sans-serif", size: 15, color: "#0f172a" },
+                height: 45
             }
         };
 
