@@ -511,6 +511,16 @@ if __name__ == "__main__":
                      index=[f"Day {TRAIN_DAYS+d+1}" for d in range(PRED_DAYS)]
                      ).to_csv(OUT / f"{label}.csv")
 
+    import json
+    anim_out = BASE / "qedi_website" / "assets" / "price_anim_data.json"
+    pc_slice_len = 200
+    anim_dict = {
+        "true_price": model["train_true_prices"][-pc_slice_len:, 0].tolist(),
+        "pred_price": model["train_pred_prices"][-pc_slice_len:, 0].tolist()
+    }
+    with open(anim_out, "w") as f:
+        json.dump(anim_dict, f)
+
     # ── Generate Plots ────────────────────────────────────────────────
     print("\nGenerating plots...")
     generate_plots(model, actual, predicted, naive, feat_cols,

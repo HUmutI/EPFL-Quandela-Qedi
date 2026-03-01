@@ -322,10 +322,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnReplayAnim = document.getElementById('btn-replay-anim');
 
     if (plotPcaAnim) {
-        fetch('assets/pca_anim_data.json')
+        fetch('assets/price_anim_data.json')
             .then(response => response.json())
             .then(data => {
-                const totalPoints = data.true_pc1.length;
+                const totalPoints = data.true_price.length;
                 const xFrames = Array.from({ length: totalPoints }, (_, i) => i + 1);
 
                 const halfIdx = Math.floor(totalPoints / 2);
@@ -334,7 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 1. The full target reality (faded grey, acts as the absolute background)
                 const traceTrueBase = {
                     x: xFrames,
-                    y: data.true_pc1,
+                    y: data.true_price,
                     mode: 'lines',
                     name: 'Target (Unknown Future)',
                     line: { color: 'rgba(68, 68, 68, 0.4)', width: 3 }
@@ -343,7 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 2. The known history ground truth (solid red for the first half, and grows dynamically)
                 const traceKnownTruth = {
                     x: xFrames.slice(0, halfIdx),
-                    y: data.true_pc1.slice(0, halfIdx),
+                    y: data.true_price.slice(0, halfIdx),
                     mode: 'lines',
                     name: 'Known Market History',
                     line: { color: 'rgba(227, 0, 15, 1)', width: 3 }
@@ -352,7 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 3. The QRC Prediction (draws the next 6 days in green)
                 const tracePredAnim = {
                     x: [xFrames[halfIdx - 1]],
-                    y: [data.pred_pc1[halfIdx - 1]],
+                    y: [data.pred_price[halfIdx - 1]],
                     mode: 'lines',
                     name: 'QRC Prediction Engine',
                     line: { color: 'rgba(46, 204, 113, 1)', width: 4 }
@@ -362,10 +362,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     margin: { l: 60, r: 20, b: 60, t: 40 },
                     xaxis: { title: 'Time (Days)', range: [0, totalPoints + 5] },
                     yaxis: {
-                        title: 'Principal Component 1 (Swaption Variance)',
+                        title: 'Swaption Price (Selected Feature Base)',
                         range: [
-                            Math.min(...data.true_pc1, ...data.pred_pc1) - 1,
-                            Math.max(...data.true_pc1, ...data.pred_pc1) + 1
+                            Math.min(...data.true_price, ...data.pred_price) - 0.05,
+                            Math.max(...data.true_price, ...data.pred_price) + 0.05
                         ]
                     },
                     paper_bgcolor: 'rgba(0,0,0,0)',
@@ -387,7 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Reset to initial state (halfIdx is the current "present day" anchor)
                     Plotly.update('plot-pca-anim', {
                         x: [xFrames, xFrames.slice(0, halfIdx), [xFrames[halfIdx - 1]]],
-                        y: [data.true_pc1, data.true_pc1.slice(0, halfIdx), [data.pred_pc1[halfIdx - 1]]]
+                        y: [data.true_price, data.true_price.slice(0, halfIdx), [data.pred_price[halfIdx - 1]]]
                     }, {}, [0, 1, 2]);
 
                     let anchorIdx = halfIdx - 1;
@@ -400,7 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         // Step 1: Predict 6 days into the future with Green Line (shooting out from the anchor)
                         Plotly.update('plot-pca-anim', {
                             x: [xFrames, xFrames.slice(0, anchorIdx + 1), xFrames.slice(anchorIdx, nextAnchor + 1)],
-                            y: [data.true_pc1, data.true_pc1.slice(0, anchorIdx + 1), data.pred_pc1.slice(anchorIdx, nextAnchor + 1)]
+                            y: [data.true_price, data.true_price.slice(0, anchorIdx + 1), data.pred_price.slice(anchorIdx, nextAnchor + 1)]
                         }, {}, [0, 1, 2]);
 
                         // Step 2: Time moves forward (Wait 500ms, then the red line "Known History" catches up to the green prediction)
@@ -412,7 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 // Erase the green line (since we are now at the new present day)
                                 Plotly.update('plot-pca-anim', {
                                     x: [xFrames, xFrames.slice(0, anchorIdx + 1), [xFrames[anchorIdx]]],
-                                    y: [data.true_pc1, data.true_pc1.slice(0, anchorIdx + 1), [data.pred_pc1[anchorIdx]]]
+                                    y: [data.true_price, data.true_price.slice(0, anchorIdx + 1), [data.pred_price[anchorIdx]]]
                                 }, {}, [0, 1, 2]);
 
                                 // Wait a beat, then predict the next 6 days
@@ -426,7 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             animTimeout = setTimeout(() => {
                                 Plotly.update('plot-pca-anim', {
                                     x: [xFrames, xFrames.slice(0, nextAnchor + 1), []],
-                                    y: [data.true_pc1, data.true_pc1.slice(0, nextAnchor + 1), []]
+                                    y: [data.true_price, data.true_price.slice(0, nextAnchor + 1), []]
                                 }, {}, [0, 1, 2]);
                             }, 800);
                         }
@@ -445,7 +445,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     btnReplayAnim.addEventListener('click', runAnimation);
                 }
             })
-            .catch(err => console.error("Error loading PCA animation data:", err));
+            .catch(err => console.error("Error loading Price animation data:", err));
     }
 
     /* --- Interactive 2D MAE Surface Heatmap --- */
