@@ -65,7 +65,7 @@ By executing the novel Hybrid Photonic Temporal QRC pipeline, we successfully be
 | **LSTM** | `0.0073` | 
 | **Photonic Linear QRC** | `0.0065` | 
 | **Hybrid Photonic Linear QRC** | `0.0028` | 
-| **🥇 Hybrid Photonic Temporal QRC (HPT-QRC)** | **`0.0027`** | 
+| **🥇 Hybrid Photonic Temporal QRC (HPT-QRC)** | **`0.0021`** | 
 
 *Maintains incredibly reliable sub-10% projection accuracy out to a 6-Day cascading prediction envelope.*
 

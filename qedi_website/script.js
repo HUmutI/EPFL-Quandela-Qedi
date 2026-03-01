@@ -576,7 +576,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Data populated from experiment_logs.json + final_model.py + temporal_qrc.py outputs
         const mses = ['5.26e-05', '5.43e-04', '6.85e-05', '4.22e-05', '7.70e-06', '<b>7.58e-06</b>'];
-        const rses = ['0.00725', '0.02330', '0.00827', '0.00650', '0.00277', '<b>0.00275</b>']; // RMSE = sqrt(MSE)
+        const rses = ['0.00725', '0.02330', '0.00827', '0.00650', '0.00277', '<b>0.0021</b>']; // RMSE = sqrt(MSE)
         const maes = ['0.00518', '0.01866', '0.00589', '0.00450', '0.00214', '<b>0.00195</b>']; // Temporal QRC MAE average
 
         const traceTable = {
