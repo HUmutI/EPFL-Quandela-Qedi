@@ -96,13 +96,19 @@ Proudly built during the 48-hour **EPFL Quantum Hackathon 2026**.
 <br/>
 <div align="center">
   <table>
-    <tr align="center">
+    <tr align="center" valign="middle">
       <td width="300" style="border: none; background: transparent;">
-        <img src="qedi_website/assets/metu_logo.png" alt="METU Logo" width="120"/><br>
+        <img src="qedi_website/assets/metu_logo.png" alt="METU Logo" width="120"/>
+      </td>
+      <td width="300" style="border: none; background: transparent;">
+        <img src="qedi_website/assets/bilkent_logo.png" alt="Bilkent Logo" width="120"/>
+      </td>
+    </tr>
+    <tr align="center" valign="top">
+      <td width="300" style="border: none; background: transparent;">
         <i>Middle East Technical University</i>
       </td>
       <td width="300" style="border: none; background: transparent;">
-        <img src="qedi_website/assets/bilkent_logo.png" alt="Bilkent Logo" width="120"/><br>
         <i>Bilkent University</i>
       </td>
     </tr>
