@@ -86,10 +86,10 @@ Tested autoregressively against classical methods, the QRC model surpassed heavy
 
 ## 👥 Meet Team Qedi
 
-Proudly built during the 48-hour **EPFL Quantum Hackathon 2026**.
+Proudly built during the 24-hour **EPFL Quantum Hackathon 2026**.
 
-* **Eren Aslan** 
-* **Hüseyin Umut Işık** 
+* **Eren Aslan**   
+* **Hüseyin Umut Işık**      
 * **Arda Kara** 
 * **Mehmet Alp Özaydın** 
 
