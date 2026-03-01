@@ -291,19 +291,26 @@
 
     <!-- The Sandbox Interactive -->
     <section id="interactive" class="section bg-light">
-        <div class="container">
-            <div class="section-header">
-                <h2>Interactive Data Imputer</h2>
-                <div class="divider"></div>
-                <p>Try it yourself! Draw a jagged market volatility curve, <strong>leave some blank gaps</strong> (lift
-                    your mouse), and let the QRC Engine reconstruct the missing data points.</p>
-            </div>
+        <div class="container" style="text-align: center;">
+            <button id="toggle-imputer-btn" class="btn-primary"
+                style="margin-bottom: 2rem; font-size: 1.2rem; padding: 1rem 3rem;">Try the Interactive Data
+                Imputer</button>
 
-            <div class="sandbox-container">
-                <canvas id="draw-canvas"></canvas>
-                <div class="sandbox-controls">
-                    <button id="btn-clear" class="btn-secondary">Clear Market Data</button>
-                    <button id="btn-impute" class="btn-primary">Run Quantum Imputation (QRC)</button>
+            <div id="imputer-content" style="display: none; text-align: left;">
+                <div class="section-header">
+                    <h2>Interactive Data Imputer</h2>
+                    <div class="divider"></div>
+                    <p>Try it yourself! Draw a jagged market volatility curve, <strong>leave some blank gaps</strong>
+                        (lift
+                        your mouse), and let the QRC Engine reconstruct the missing data points.</p>
+                </div>
+
+                <div class="sandbox-container">
+                    <canvas id="draw-canvas"></canvas>
+                    <div class="sandbox-controls">
+                        <button id="btn-clear" class="btn-secondary">Clear Market Data</button>
+                        <button id="btn-impute" class="btn-primary">Run Quantum Imputation (QRC)</button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -546,4 +546,22 @@ document.addEventListener('DOMContentLoaded', () => {
         Plotly.newPlot('plot-model-comparison', [traceTable], layoutTable, { responsive: true });
     }
 
+    /* --- Imputer Toggle Button --- */
+    const toggleImputerBtn = document.getElementById('toggle-imputer-btn');
+    const imputerContent = document.getElementById('imputer-content');
+
+    if (toggleImputerBtn && imputerContent) {
+        toggleImputerBtn.addEventListener('click', () => {
+            if (imputerContent.style.display === 'none') {
+                imputerContent.style.display = 'block';
+                toggleImputerBtn.textContent = 'Hide Interactive Data Imputer';
+                toggleImputerBtn.classList.replace('btn-primary', 'btn-secondary');
+            } else {
+                imputerContent.style.display = 'none';
+                toggleImputerBtn.textContent = 'Try the Interactive Data Imputer';
+                toggleImputerBtn.classList.replace('btn-secondary', 'btn-primary');
+            }
+        });
+    }
+
 });
