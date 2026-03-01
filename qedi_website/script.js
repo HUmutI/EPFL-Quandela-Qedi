@@ -574,4 +574,123 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    /* --- Photonic Temporal QRC Circuit Animation --- */
+    const qrcCanvas = document.getElementById('qrc-circuit-anim');
+    if (qrcCanvas) {
+        const ctx = qrcCanvas.getContext('2d');
+        let t = 0;
+
+        const N_MODES = 8;
+        const N_INPUT = 5;
+        const N_STEPS = 5; // Temporal window elements
+        const N_VIRT = 3;  // Virtual node depths
+
+        function drawCircuit() {
+            // Resize handler inside drawing for flex/responsiveness
+            const w = qrcCanvas.width = qrcCanvas.offsetWidth || 400;
+            const h = qrcCanvas.height = qrcCanvas.offsetHeight || 180;
+            ctx.clearRect(0, 0, w, h);
+
+            const modeSpacing = h / (N_MODES + 1);
+
+            // Draw Mode lines
+            ctx.lineWidth = 1;
+            for (let m = 0; m < N_MODES; m++) {
+                const y = (m + 1) * modeSpacing;
+                // Distinction: Input modes (0-4) are blue-ish, Memory modes (5-7) are purple-ish
+                ctx.strokeStyle = m < N_INPUT ? 'rgba(52, 152, 219, 0.3)' : 'rgba(155, 89, 182, 0.3)';
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(w, y);
+                ctx.stroke();
+
+                // Labels
+                ctx.fillStyle = m < N_INPUT ? 'rgba(52, 152, 219, 0.8)' : 'rgba(155, 89, 182, 0.8)';
+                ctx.font = '9px Inter';
+                ctx.fillText(m < N_INPUT ? 'In' : 'Mem', 5, y - 3);
+            }
+
+            const totalSegments = N_STEPS + N_VIRT;
+            const segmentWidth = w / (totalSegments + 1);
+
+            // Draw mixing interferometers & phase shifters
+            for (let s = 0; s < totalSegments; s++) {
+                const cx = (s + 1) * segmentWidth;
+
+                // 1. Universal Mixing Interferometer (All 8 modes)
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+                ctx.beginPath();
+                ctx.rect(cx - 8, modeSpacing - 5, 16, (N_MODES - 1) * modeSpacing + 10);
+                ctx.fill();
+                ctx.stroke();
+
+                // Draw internal entanglement webs
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                for (let i = 0; i < 3; i++) {
+                    ctx.moveTo(cx - 8, (1 + Math.random() * (N_MODES - 1)) * modeSpacing);
+                    ctx.lineTo(cx + 8, (1 + Math.random() * (N_MODES - 1)) * modeSpacing);
+                }
+                ctx.stroke();
+
+                // 2. Phase Shifters (ONLY if it's a temporal step, and ONLY on top 5 modes)
+                if (s < N_STEPS) {
+                    for (let m = 0; m < N_INPUT; m++) {
+                        ctx.fillStyle = 'rgba(46, 204, 113, 0.8)';
+                        ctx.beginPath();
+                        ctx.arc(cx + 12, (m + 1) * modeSpacing, 3, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    // Step Labels
+                    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                    ctx.font = '8px Inter';
+                    ctx.fillText(`T${s + 1}`, cx - 5, h - 5);
+                } else {
+                    // Virtual Depth Labels
+                    ctx.fillStyle = 'rgba(231, 76, 60, 0.5)';
+                    ctx.font = '8px Inter';
+                    ctx.fillText(`V${s - N_STEPS + 1}`, cx - 5, h - 5);
+                }
+            }
+
+            // Draw traveling photons
+            // 3 Photons moving rightwards
+            const speed = 0.005;
+            const px = (t * speed * w) % (w + 50) - 25; // Loop across screen
+
+            // Map photon position to closest column to figure out random jumps
+            let currentSegment = Math.floor(px / segmentWidth);
+
+            for (let p = 0; p < 3; p++) {
+                // Pseudo-random y position based on time and photon ID to simulate interference mixing
+                let pseudoRand = Math.sin(currentSegment * 12.3 + p * 4.5);
+                let targetMode = Math.floor((pseudoRand + 1) / 2 * N_MODES);
+
+                // Smoothing transition between modes
+                let modeFrac = (px % segmentWidth) / segmentWidth;
+                let lastMode = Math.floor((Math.sin((currentSegment - 1) * 12.3 + p * 4.5) + 1) / 2 * N_MODES);
+
+                // If it's entering the first mixer, originate from top 5 (input limits)
+                if (currentSegment <= 0) { lastMode = p % N_INPUT; targetMode = lastMode; }
+
+                let renderMode = lastMode + (targetMode - lastMode) * (Math.sin(modeFrac * Math.PI - Math.PI / 2) * 0.5 + 0.5);
+                let py = (renderMode + 1) * modeSpacing;
+
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = 'rgba(231, 76, 60, 1)';
+                ctx.fillStyle = '#ff7675';
+                ctx.beginPath();
+                ctx.arc(px, py, 4, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+
+            t++;
+            requestAnimationFrame(drawCircuit);
+        }
+
+        drawCircuit();
+    }
+
 });

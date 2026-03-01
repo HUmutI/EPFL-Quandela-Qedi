@@ -114,14 +114,16 @@
                             style="font-weight: 800; color: white; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;">
                             <br>Hybrid Photonic Temporal QRC
                         </div>
-                        <div class="qrc-internals">
-                            <div class="qrc-modes">
+                        <div class="qrc-internals" style="position: relative;">
+                            <canvas id="qrc-circuit-anim" width="400" height="180"
+                                style="width: 100%; border-radius: 6px; background: rgba(0,0,0,0.5); display: block; margin-bottom: 0.5rem;"></canvas>
+                            <div class="qrc-modes" style="display: none;">
                                 <div class="input-modes">5 Input Modes<br><span
                                         style="font-size: 0.7rem; color: #ccc;">(Phase Encoded)</span></div>
                                 <div class="memory-modes">3 Memory Modes<br><span
                                         style="font-size: 0.7rem; color: #ccc;">(Unencoded Loop)</span></div>
                             </div>
-                            <div class="qrc-layers">
+                            <div class="qrc-layers" style="display: none;">
                                 <div class="layer mix">Temporal Loop<br><span style="font-size: 0.7rem; color: #ccc;">(5
                                         Time Steps)</span></div>
                                 <div class="layer virt">Virtual Nodes<br><span
