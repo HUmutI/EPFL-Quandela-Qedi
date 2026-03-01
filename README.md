@@ -1,7 +1,7 @@
 <div align="center">
   <h1>Team Qedi 🐈‍⬛</h1>
   <p><strong>EPFL Quantum Hackathon 2026 • Quandela Challenge</strong></p>
-  <h3>Photonic Temporal QRC (PT-QRC) — Swaption Volatility Surface Forecaster</h3>
+  <h3>Hybrid Photonic Temporal QRC (HPT-QRC) — Swaption Volatility Surface Forecaster</h3>
   <p><i>Teaching photons to predict the market so we can finally sleep.</i></p>
 </div>
 
@@ -13,13 +13,13 @@ A **swaption volatility surface** is a 2D grid indexed by tenor and maturity. Pr
 1. **Predictive Forecasting** — Forecasting the complex non-linear surface shifts for the next $H$ days smoothly.
 2. **Data Imputation Reconstruction** — Real markets suffer from outages, resulting in `NaN` entries across the option grid. The model must analytically infer missing surface areas by relying on deeply correlated temporal topologies.
 
-**The Quantum Solution:** We compress the manifold via PCA and process the temporal dynamics using a entirely newly adapted **Photonic Temporal Quantum Reservoir Computer (PT-QRC)** architecture. Inspired by *Li et al. (2024)*, we took their qubit-based framework and adapted it to a purely Photonic Quantum Reservoir powered by **[MerLin by Quandela](https://merlinquantum.ai/)**.
+**The Quantum Solution:** We compress the manifold via PCA and process the temporal dynamics using a entirely newly adapted **Hybrid Photonic Temporal Quantum Reservoir Computer (HPT-QRC)** architecture. Inspired by *Li et al. (2024)*, we took their qubit-based framework and adapted it to a purely Photonic Quantum Reservoir powered by **[MerLin by Quandela](https://merlinquantum.ai/)**.
 
 ---
 
-## ⚙️ 2. Photonic Temporal QRC Architecture
+## ⚙️ 2. Hybrid Photonic Temporal QRC Architecture
 
-Instead of a standard QRC, we implemented a state-of-the-art **PT-QRC pipeline**:
+Instead of a standard QRC, we implemented a state-of-the-art **HPT-QRC pipeline**:
 
 1. **Preprocessing**: Raw 224D Market Surface $\rightarrow$ `StandardScaler` + `PCA (5D)` $\rightarrow$ Rolling 5-Day Window (1×25)
 2. **Dedicated Memory Modes**: Instead of mapping data to all spatial modes simultaneously, our temporal array uses **5 input modes** (phase encoded) and **3 dedicated memory modes** (unencoded loop). The memory modes continuously accumulate historical state contexts across 5 time steps through serial phase mixing.
@@ -31,11 +31,13 @@ Instead of a standard QRC, we implemented a state-of-the-art **PT-QRC pipeline**
 
 ## 🚀 3. CLI Reference & Setup
 
-Requires `torch`, `pennylane`, and standard ML arrays (`numpy`, `pandas`, `scikit-learn`).
+Requires `torch`, `pcvl`, and standard ML arrays (`numpy`, `pandas`, `scikit-learn`).
 
 ```bash
-# Activate the native environment
+# First create the environment and install dependencies
+conda create -n quandela python=3.10
 conda activate quandela
+pip install -r requirements.txt
 ```
 
 ### Validation Mode
@@ -54,7 +56,7 @@ python -m src.main predict --output artifacts/submission.xlsx
 
 ## 📈 4. Final Benchmark Results
 
-By executing the novel Photonic Temporal QRC pipeline, we successfully beat our underlying standard QRC framework and left classical baselines absolutely obsolete.
+By executing the novel Hybrid Photonic Temporal QRC pipeline, we successfully beat our underlying standard QRC framework and left classical baselines absolutely obsolete.
 
 | Model | RMSE Error |
 | :--- | :---: |
@@ -63,7 +65,7 @@ By executing the novel Photonic Temporal QRC pipeline, we successfully beat our 
 | **LSTM** | `0.0073` | 
 | **Photonic Linear QRC** | `0.0065` | 
 | **Hybrid Photonic Linear QRC** | `0.0028` | 
-| **🥇 Hybrid Photonic Temporal QRC (PT-QRC)** | **`0.0027`** | 
+| **🥇 Hybrid Photonic Temporal QRC (HPT-QRC)** | **`0.0027`** | 
 
 *Maintains incredibly reliable sub-10% projection accuracy out to a 6-Day cascading prediction envelope.*
 
