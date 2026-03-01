@@ -569,11 +569,18 @@ document.addEventListener('DOMContentLoaded', () => {
     /* --- Interactive Model Performance Leaderboard --- */
     const plotModelComp = document.getElementById('plot-model-comparison');
     if (plotModelComp) {
-        const rowLabels = ['Classical LSTM', 'QSVR (Quantum SVR)', 'Champion Hybrid QNN', '<b>🥇 MerLin Photonic QRC (Our Final)</b>'];
-        const mses = ['5.26e-05', '5.43e-04', '6.85e-05', '<b>7.70e-06</b>'];
-        const rses = ['0.00725', '0.02330', '0.00827', '<b>0.00277</b>'];
-        const maes = ['0.00518', '0.01866', '0.00589', '<b>0.00214</b>'];
-        const r2s = ['0.4874', '-4.0951', '0.2541', '<b>0.9992</b>'];
+        const rowLabels = [
+            'Classical LSTM',
+            'QSVR (Quantum SVR)',
+            'Champion Hybrid QNN',
+            'MerLin Photonic QRC',
+            '<b>🥇 Temporal QRC (Our Final)</b>'
+        ];
+
+        // Data populated from experiment_logs.json + final_model.py + temporal_qrc.py outputs
+        const mses = ['5.26e-05', '5.43e-04', '6.85e-05', '7.70e-06', '<b>7.58e-06</b>'];
+        const rses = ['0.00725', '0.02330', '0.00827', '0.00277', '<b>0.00275</b>']; // RMSE = sqrt(MSE)
+        const maes = ['0.00518', '0.01866', '0.00589', '0.00214', '<b>0.00195</b>']; // Temporal QRC MAE average
 
         const traceTable = {
             type: 'table',
@@ -582,8 +589,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     "<b>Model Architecture</b>",
                     "<b>Mean Squared Error (MSE)</b>",
                     "<b>Root Mean Squared (RMSE)</b>",
-                    "<b>Mean Absolute Error (MAE)</b>",
-                    "<b>R² Score</b>"
+                    "<b>Mean Absolute Error (MAE)</b>"
                 ],
                 align: "center",
                 line: { width: 1, color: '#e2e8f0' },
@@ -592,17 +598,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 height: 40
             },
             cells: {
-                values: [rowLabels, mses, rses, maes, r2s],
+                values: [rowLabels, mses, rses, maes],
                 align: "center",
                 line: { color: "#e2e8f0", width: 1 },
                 fill: {
                     color: [
-                        // Column colors (rows 1-3: light grey, row 4: green highlight)
-                        ['#f8fafc', '#f8fafc', '#f8fafc', 'rgba(46, 204, 113, 0.15)'], // Col 1
-                        ['#f8fafc', '#f8fafc', '#f8fafc', 'rgba(46, 204, 113, 0.15)'], // Col 2
-                        ['#f8fafc', '#f8fafc', '#f8fafc', 'rgba(46, 204, 113, 0.15)'], // Col 3
-                        ['#f8fafc', '#f8fafc', '#f8fafc', 'rgba(46, 204, 113, 0.15)'], // Col 4
-                        ['#f8fafc', '#f8fafc', '#f8fafc', 'rgba(46, 204, 113, 0.15)']  // Col 5
+                        // Column colors (rows 1-4: light grey, row 5: green highlight)
+                        ['#f8fafc', '#f8fafc', '#f8fafc', '#f8fafc', 'rgba(46, 204, 113, 0.15)'], // Col 1
+                        ['#f8fafc', '#f8fafc', '#f8fafc', '#f8fafc', 'rgba(46, 204, 113, 0.15)'], // Col 2
+                        ['#f8fafc', '#f8fafc', '#f8fafc', '#f8fafc', 'rgba(46, 204, 113, 0.15)'], // Col 3
+                        ['#f8fafc', '#f8fafc', '#f8fafc', '#f8fafc', 'rgba(46, 204, 113, 0.15)'], // Col 4
                     ]
                 },
                 font: { family: "Inter, sans-serif", size: 13, color: "#0f172a" },
