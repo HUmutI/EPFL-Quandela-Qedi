@@ -564,7 +564,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 Plotly.newPlot('plot-mae-surface', [traceMae], layoutMae, { responsive: true });
             })
-            .catch(err => console.error("Error loading MAE Surface data:", err));
+    }
+
+    /* --- Interactive Model Performance Leaderboard --- */
+    const plotModelComp = document.getElementById('plot-model-comparison');
+    if (plotModelComp) {
+        const rowLabels = ['Classical LSTM', 'QSVR (Quantum SVR)', 'Champion Hybrid QNN', '<b>🥇 MerLin Photonic QRC (Our Final)</b>'];
+        const mses = ['5.26e-05', '5.43e-04', '6.85e-05', '<b>7.70e-06</b>'];
+        const rses = ['0.00725', '0.02330', '0.00827', '<b>0.00277</b>'];
+        const maes = ['0.00518', '0.01866', '0.00589', '<b>0.00214</b>'];
+        const r2s = ['0.4874', '-4.0951', '0.2541', '<b>0.9992</b>'];
+
+        const traceTable = {
+            type: 'table',
+            header: {
+                values: [
+                    "<b>Model Architecture</b>",
+                    "<b>Mean Squared Error (MSE)</b>",
+                    "<b>Root Mean Squared (RMSE)</b>",
+                    "<b>Mean Absolute Error (MAE)</b>",
+                    "<b>R² Score</b>"
+                ],
+                align: "center",
+                line: { width: 1, color: '#e2e8f0' },
+                fill: { color: "#1e293b" }, // Dark Slate background
+                font: { family: "Inter, sans-serif", size: 14, color: "white" },
+                height: 40
+            },
+            cells: {
+                values: [rowLabels, mses, rses, maes, r2s],
+                align: "center",
+                line: { color: "#e2e8f0", width: 1 },
+                fill: {
+                    color: [
+                        // Column colors (rows 1-3: light grey, row 4: green highlight)
+                        ['#f8fafc', '#f8fafc', '#f8fafc', 'rgba(46, 204, 113, 0.15)'], // Col 1
+                        ['#f8fafc', '#f8fafc', '#f8fafc', 'rgba(46, 204, 113, 0.15)'], // Col 2
+                        ['#f8fafc', '#f8fafc', '#f8fafc', 'rgba(46, 204, 113, 0.15)'], // Col 3
+                        ['#f8fafc', '#f8fafc', '#f8fafc', 'rgba(46, 204, 113, 0.15)'], // Col 4
+                        ['#f8fafc', '#f8fafc', '#f8fafc', 'rgba(46, 204, 113, 0.15)']  // Col 5
+                    ]
+                },
+                font: { family: "Inter, sans-serif", size: 13, color: "#0f172a" },
+                height: 35
+            }
+        };
+
+        const layoutTable = {
+            margin: { l: 10, r: 10, b: 10, t: 10 },
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)'
+        };
+
+        Plotly.newPlot('plot-model-comparison', [traceTable], layoutTable, { responsive: true });
     }
 
 });
