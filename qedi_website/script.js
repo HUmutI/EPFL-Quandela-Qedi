@@ -566,4 +566,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    /* --- Pipeline Animation Click Zoom --- */
+    const pipelineAnim = document.getElementById('pipeline-anim-container');
+    if (pipelineAnim) {
+        pipelineAnim.addEventListener('click', () => {
+            pipelineAnim.classList.toggle('window-expanded');
+        });
+    }
+
 });

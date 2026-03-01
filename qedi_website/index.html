@@ -34,7 +34,7 @@
         </div>
         <div class="hero-content">
             <div class="subtitle">EPFL Quantum Hackathon &bull; Quandela Challenge</div>
-            <h1 class="main-title">Photonic Temporal QRC<br>(PT-QRC)</h1>
+            <h1 class="main-title">Hybrid Photonic Temporal QRC<br>(HPT-QRC)</h1>
             <h2 class="sub-title">Swaption Volatility Surface Forecaster</h2>
 
             <div class="team-container">
@@ -82,7 +82,7 @@
     <section id="architecture" class="section bg-light">
         <div class="container">
             <div class="section-header">
-                <h2>02. Photonic Temporal QRC Architecture</h2>
+                <h2>02. Hybrid Photonic Temporal QRC Architecture</h2>
                 <div class="divider"></div>
                 <p>Inspired by <a href="https://arxiv.org/pdf/2505.13933" target="_blank"
                         style="color: var(--epfl-red); font-weight: 600; text-decoration: none;">Li et al., "QRC for
@@ -94,7 +94,8 @@
 
             <!-- PT-QRC Pipeline Animation -->
             <div class="visual-placeholder" style="width: 100%;">
-                <div class="pipeline-container">
+                <div id="pipeline-anim-container" class="pipeline-container" title="Click to enlarge pipeline"
+                    style="cursor: zoom-in; transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;">
                     <div class="pipe-step process">
                         <div class="label">Raw Market Surface<br>(224D)</div>
                     </div>
@@ -111,7 +112,7 @@
                     <div class="pipe-step qrc-block" style="flex: 2;">
                         <div
                             style="font-weight: 800; color: white; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;">
-                            <br>Photonic Temporal QRC
+                            <br>Hybrid Photonic Temporal QRC
                         </div>
                         <div class="qrc-internals">
                             <div class="qrc-modes">
@@ -181,7 +182,8 @@
                             <h4>Ensemble LexGrouping Compression</h4>
                             <p>Instead of measuring impossibly vast raw Fock states, we group the probability
                                 vectors via <strong>LexGrouping</strong> across 3 random seeds × 3 virtual depths.
-                                By utilizing this Photonic Temporal QRC architecture, we massively outperformed our
+                                By utilizing this Hybrid Photonic Temporal QRC architecture, we massively outperformed
+                                our
                                 standard
                                 formulation!</p>
                         </div>
@@ -220,7 +222,8 @@
             <div class="section-header">
                 <h2>03. Results vs Classical Baselines</h2>
                 <div class="divider"></div>
-                <p style="text-align: center; margin-bottom: 2rem;">By executing the Photonic Temporal QRC pipeline (Li
+                <p style="text-align: center; margin-bottom: 2rem;">By executing the Hybrid Photonic Temporal QRC
+                    pipeline (Li
                     et al.,
                     2024), we successfully beat our underlying standard QRC framework and left classical baseline LSTM
                     networks and quantum regression tools absolutely obsolete.</p>
