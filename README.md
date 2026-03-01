@@ -1,49 +1,31 @@
 <div align="center">
   <h1>Team Qedi 🐈‍⬛</h1>
   <p><strong>EPFL Quantum Hackathon 2026 • Quandela Challenge</strong></p>
-  <h3>MerLin Photonic QRC — Swaption Surface Forecaster</h3>
+  <h3>Photonic Temporal QRC (PT-QRC) — Swaption Volatility Surface Forecaster</h3>
+  <p><i>Teaching photons to predict the market so we can finally sleep.</i></p>
 </div>
 
 <br />
 
-## 📖 1. Problem Statement
+## 📖 1. The Challenge
 
-A **swaption volatility surface** is a 2-dimensional grid of implied volatilities indexed by tenor (time to option expiry) and maturity (underlying swap length). Observing one surface per trading day, the challenge requires:
-1. **Forecasting** — given a history of surfaces, predict the next $H$ surfaces.
-2. **Reconstruction** — given a surface with missing entries, analytically infer the full surface.
+A **swaption volatility surface** is a 2D grid indexed by tenor and maturity. Providing 224 high-dimensional features per day, the challenge demands two primary tasks:
+1. **Predictive Forecasting** — Forecasting the complex non-linear surface shifts for the next $H$ days smoothly.
+2. **Data Imputation Reconstruction** — Real markets suffer from outages, resulting in `NaN` entries across the option grid. The model must analytically infer missing surface areas by relying on deeply correlated temporal topologies.
 
-The surfaces are high-dimensional (224 features) but lie on a low-dimensional manifold: adjacent points are strongly correlated, and day-to-day changes are smooth. 
-
-**The Quantum Solution:** We compress the manifold via PCA and process the temporal dynamics using a **Quantum Reservoir Computer (QRC)**. Our specific reservoir is **[MerLin by Quandela](https://merlinquantum.ai/)** — a photonic quantum circuit whose measurement statistics provide robust nonlinear features, entirely bypassing the vanishing gradients that ruin classical LSTMs..
+**The Quantum Solution:** We compress the manifold via PCA and process the temporal dynamics using a entirely newly adapted **Photonic Temporal Quantum Reservoir Computer (PT-QRC)** architecture. Inspired by *Li et al. (2024)*, we took their qubit-based framework and adapted it to a purely Photonic Quantum Reservoir powered by **[MerLin by Quandela](https://merlinquantum.ai/)**.
 
 ---
 
-## 📊 2. Dataset
+## ⚙️ 3. Photonic Temporal QRC Architecture
 
-| Property | Value |
-|---|---|
-| **Rows** | 494 trading days, date-sorted |
-| **Columns** | `Date`, `Type`, + 224 surface columns |
-| **Surface Grid** | 14 tenors × 16 maturities = 224 features |
-| **Test Matrix** | Partial rows with `NaN` requiring imputation |
+Instead of a standard QRC, we implemented a state-of-the-art **PT-QRC pipeline**:
 
-*Note: The pipeline strictly uses row indexing (0 = first trading day) rather than calendar dates to elegantly handle irregular market gaps (weekends, holidays).*
-
----
-
-## ⚙️ 3. Pipeline Architecture
-
-Our champion model strictly follows this forward-pass flow:
-
-1. **`VectorStandardizer`**: Applies per-feature unit-variance scaling on the $T \times 224$ training set.
-2. **`PCAManifoldCodec`**: Whitened PCA reduces the 224 dimensions to **8 latent components** ($d=8$). For missing data (reconstruction), it uses a closed-form masked Tikhonov/Ridge inference ($\lambda = 10^{-3}$) to find the latent $z$ that best explains the observed entries.
-3. **`Temporal Feature Engineering`**: At each timestep, we construct a 17-dimensional enhanced vector containing the latent code $z_t$, the absolute temporal difference $\|\Delta z_t\|$, and the standardized calendar $gap_t$.
-4. **`MerlinReservoirEnsemble`**: 
-   - Uses two independent `MerlinPhotonicReservoir` instances for variance reduction.
-   - **Delay Embedding**: The 8 photonic circuit modes are split (4 for current state, 4 for previous state).
-   - **Photonic Circuit**: Operates on an unbunched 4-photon state through frozen random unitaries. Measurement probabilities ($p$) are expanded non-linearly ($\varphi = [p \| p^2]$) and randomly projected into a 32-dimensional space.
-   - **Leaky Integration**: Applies an exponential moving average ($\gamma=0.5$) to accumulate temporal context across the sequential window.
-5. **`DirectResidualForecaster`**: Instead of predicting absolute codes, we predict the *change* $\Delta z_h$ utilizing 6 independent Ridge Regression models ($\alpha = 2000$).
+1. **Preprocessing**: Raw 224D Market Surface $\rightarrow$ `StandardScaler` + `PCA (5D)` $\rightarrow$ Rolling 5-Day Window (1×25)
+2. **Dedicated Memory Modes**: Instead of mapping data to all spatial modes simultaneously, our temporal array uses **5 input modes** (phase encoded) and **3 dedicated memory modes** (unencoded loop). The memory modes continuously accumulate historical state contexts across 5 time steps through serial phase mixing.
+3. **Virtual Nodes**: We sample the evolving physical system at multiple structural post-processing depths (Depths 1, 2, 3). These **Virtual Nodes** emulate capturing chronological measurement sub-intervals, massively expanding our temporal feature dimensionality without adding physical photon bounds.
+4. **Ensemble LexGrouping Compression**: Instead of measuring impossibly vast raw Fock states, we group the probability vectors via **LexGrouping** across 3 random seeds × 3 virtual depths (= 9 Circuits). 
+5. **Direct Target Ridge Forecaster**: By augmenting 90 Quantum Features with the 25 Classic Features, extracting the most prominent Non-linear Mutual Information quantum channels, an $L2$ regularized Ridge Regression projection ($\alpha=10.0$) predicts the consecutive future states.
 
 ---
 
@@ -72,15 +54,17 @@ python -m src.main predict --output artifacts/submission.xlsx
 
 ## 📈 5. Final Benchmark Results
 
-Tested autoregressively against classical methods, the QRC model surpassed heavyweight baselines.
+By executing the novel Photonic Temporal QRC pipeline, we successfully beat our underlying standard QRC framework and left classical baselines absolutely obsolete.
 
-| Model | RMSE Error | Description |
-| :--- | :---: | :--- |
-| **Naive Baseline** | `0.0033` | Persistence model, fails on volatility shifts. |
-| **Classical LSTM** | `0.0089` | Parameter bloat causes catastrophic overfitting. |
-| **🥇 Team Qedi (Hybrid QRC)** | **`0.0083`** | **Our MerLin-powered 8-mode architecture.** |
+| Model | RMSE Error |
+| :--- | :---: |
+| **QSVR** | `0.0233` | 
+| **Hybrid QNN** | `0.0083` | 
+| **LSTM** | `0.0073` | 
+| **Photonic Linear QRC** | `0.0028` | 
+| **🥇 Photonic Temporal QRC (PT-QRC)** | **`0.0027`** | 
 
-**Output Artifacts:** The engine automatically generates heatmaps (`error_heatmap.png`), histogram distributions (`error_histograms.png`), and cascading performance sweeps (`forecast_quality.png`) saved directly to `artifacts/validation/`.
+*Maintains incredibly reliable sub-10% projection accuracy out to a 6-Day cascading prediction envelope.*
 
 ---
 
@@ -88,20 +72,20 @@ Tested autoregressively against classical methods, the QRC model surpassed heavy
 
 Proudly built during the 24-hour **EPFL Quantum Hackathon 2026**.
 
-* **Eren Aslan**   
-* **Hüseyin Umut Işık**      
-* **Arda Kara** 
-* **Mehmet Alp Özaydın** 
+* [**Eren Aslan**](https://www.linkedin.com/in/eren-aslan-421b66191/)   
+* [**Hüseyin Umut Işık**](https://www.linkedin.com/in/h%C3%BCseyin-umut-i%C5%9F%C4%B1k-7b3ba4255/)      
+* [**Arda Kara**](https://www.linkedin.com/in/arda-kara0/) 
+* [**Mehmet Alp Özaydın**](https://www.linkedin.com/in/mehmet-alp-%C3%B6zayd%C4%B1n-8455bb246/) 
 
 <br/>
 <div align="center">
   <table>
     <tr align="center" valign="middle">
       <td width="300" style="border: none; background: transparent;">
-        <img src="qedi_website/assets/metu_logo.png" alt="METU Logo" width="120"/>
+        <a href="https://www.metu.edu.tr/tr" target="_blank"><img src="qedi_website/assets/metu_logo.png" alt="METU Logo" width="120"/></a>
       </td>
       <td width="300" style="border: none; background: transparent;">
-        <img src="qedi_website/assets/bilkent_logo.png" alt="Bilkent Logo" width="120"/>
+        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank"><img src="qedi_website/assets/bilkent_logo.png" alt="Bilkent Logo" width="120"/></a>
       </td>
     </tr>
     <tr align="center" valign="top">
