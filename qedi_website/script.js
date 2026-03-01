@@ -554,6 +554,8 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleImputerBtn.addEventListener('click', () => {
             if (imputerContent.style.display === 'none') {
                 imputerContent.style.display = 'block';
+                // Trigger a resize to correctly recalculate sandbox canvas dimensions now that parent is visible
+                window.dispatchEvent(new Event('resize'));
                 setTimeout(() => {
                     imputerContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }, 100);
