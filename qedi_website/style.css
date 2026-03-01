@@ -406,24 +406,32 @@ h3 {
     padding: 1.5rem;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 0.5rem;
     color: white;
     width: 100%;
+    margin-bottom: 4rem;
+    overflow-x: auto;
 }
 
 .pipe-step {
-    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: auto;
     text-align: center;
     border-radius: 8px;
     position: relative;
+    padding: 0.5rem;
 }
 
 .pipe-step.process {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 0.8rem;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 600;
 }
 
@@ -492,6 +500,7 @@ h3 {
 
 .pipe-step.split {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 0.5rem;
@@ -521,23 +530,26 @@ h3 {
 .pipe-anim-arrow {
     color: var(--epfl-red);
     font-size: 1.2rem;
-    margin: 0.3rem 0;
-    animation: flow-down 1.2s infinite;
+    margin: 0 0.2rem;
+    align-self: center;
+    display: flex;
+    align-items: center;
+    animation: flow-right 1.2s infinite;
 }
 
-@keyframes flow-down {
+@keyframes flow-right {
     0% {
-        transform: translateY(-3px);
+        transform: translateX(-3px);
         opacity: 0.3;
     }
 
     50% {
-        transform: translateY(3px);
+        transform: translateX(3px);
         opacity: 1;
     }
 
     100% {
-        transform: translateY(-3px);
+        transform: translateX(-3px);
         opacity: 0.3;
     }
 }
