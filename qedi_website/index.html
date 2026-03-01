@@ -33,7 +33,7 @@
         </div>
         <div class="hero-content">
             <div class="subtitle">EPFL Quantum Hackathon &bull; Quandela Challenge</div>
-            <h1 class="main-title">MerLin Photonic QRC</h1>
+            <h1 class="main-title">Photonic Temporal QRC (PT-QRC)</h1>
             <h2 class="sub-title">Swaption Volatility Surface Forecaster</h2>
 
             <div class="team-container">
@@ -97,7 +97,7 @@
     <section id="architecture" class="section bg-light">
         <div class="container">
             <div class="section-header">
-                <h2>03. Temporal QRC Architecture</h2>
+                <h2>03. Photonic Temporal QRC Architecture</h2>
                 <div class="divider"></div>
                 <p>Inspired by <a href="https://arxiv.org/pdf/2505.13933" target="_blank"
                         style="color: var(--epfl-red); font-weight: 600; text-decoration: none;">Li et al., "QRC for
@@ -136,7 +136,8 @@
                                 <h4>Ensemble LexGrouping Compression</h4>
                                 <p>Instead of measuring impossibly vast raw Fock states, we group the probability
                                     vectors via <strong>LexGrouping</strong> across 3 random seeds × 3 virtual depths.
-                                    By utilizing this Temporal QRC architecture, we massively outperformed our standard
+                                    By utilizing this Photonic Temporal QRC architecture, we massively outperformed our
+                                    standard
                                     formulation!</p>
                             </div>
                         </li>
@@ -178,7 +179,8 @@
             <div class="section-header">
                 <h2>04. Results vs Classical Baselines</h2>
                 <div class="divider"></div>
-                <p style="text-align: center; margin-bottom: 2rem;">By executing the Temporal QRC pipeline (Li et al.,
+                <p style="text-align: center; margin-bottom: 2rem;">By executing the Photonic Temporal QRC pipeline (Li
+                    et al.,
                     2024), we successfully beat our underlying standard QRC framework and left classical baseline LSTM
                     networks and quantum regression tools absolutely obsolete.</p>
             </div>
@@ -205,7 +207,7 @@
                     <p class="label">RMSE Error</p>
                 </div>
                 <div class="metric-card highlight">
-                    <h5>Temporal QRC</h5>
+                    <h5>Photonic Temporal QRC</h5>
                     <div class="score">0.0027</div>
                     <p class="label">RMSE Error</p>
                     <div class="badge">🥇 Champion Model</div>
@@ -231,7 +233,7 @@
                         <div id="plot-predicted"
                             style="height: 450px; width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
                         </div>
-                        <p class="caption">MerLin Photonic QRC Prediction</p>
+                        <p class="caption">PT-QRC Prediction</p>
                     </div>
                 </div>
 
@@ -244,7 +246,7 @@
                     <p class="caption">Interactive Error Grid: (Predicted − Actual) across all 224 features.</p>
                 </div>
 
-                <h3 style="text-align: center; color: var(--dark-slate); margin-bottom: 2rem;">MerLin QRC in Action:
+                <h3 style="text-align: center; color: var(--dark-slate); margin-bottom: 2rem;">PT-QRC in Action:
                     Tracking Latent Manifold Trajectory</h3>
                 <div class="plot-box" style="margin-bottom: 4rem; position: relative;">
                     <div id="plot-pca-anim"

@@ -572,9 +572,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const rowLabels = [
             'Classical LSTM',
             'QSVR (Quantum SVR)',
-            'Champion Hybrid QNN',
-            'MerLin Photonic QRC',
-            '<b>🥇 Temporal QRC (Our Final)</b>'
+            'Hybrid QNN',
+            'Standard Photonic QRC',
+            '<b>🥇 Photonic Temporal QRC (Our Final)</b>'
         ];
 
         // Data populated from experiment_logs.json + final_model.py + temporal_qrc.py outputs
