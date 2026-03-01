@@ -399,94 +399,155 @@ h3 {
     font-size: 1rem;
 }
 
-/* QRC Anim Graphic */
-.qrc-anim {
+/* PT-QRC Pipeline Animation */
+.pipeline-container {
+    background: #0f172a;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    background: var(--white);
-    padding: 3rem;
-    border-radius: 50%;
-    aspect-ratio: 1;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
-    border: 1px solid var(--border-color);
+    color: white;
+    width: 100%;
 }
 
-.qrc-reservoir {
+.pipe-step {
+    width: 100%;
+    text-align: center;
+    border-radius: 8px;
     position: relative;
-    width: 60%;
-    height: 60%;
-    border-radius: 50%;
-    border: 2px dashed rgba(227, 0, 15, 0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: spin 30s linear infinite;
 }
 
-@keyframes spin {
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-.qrc-core {
-    font-weight: 800;
-    color: var(--epfl-red);
-    animation: counter-spin 30s linear infinite;
-}
-
-@keyframes counter-spin {
-    100% {
-        transform: rotate(-360deg);
-    }
-}
-
-.qrc-node {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background-color: var(--dark-slate);
-}
-
-.n1 {
-    top: -6px;
-    left: 50%;
-}
-
-.n2 {
-    bottom: -6px;
-    left: 50%;
-}
-
-.n3 {
-    left: -6px;
-    top: 50%;
-}
-
-.n4 {
-    right: -6px;
-    top: 50%;
-}
-
-.n5 {
-    top: 20%;
-    right: 10%;
-    background-color: var(--epfl-red);
-}
-
-.qrc-input,
-.qrc-output {
-    font-weight: 600;
-    color: var(--text-light);
+.pipe-step.process {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.8rem;
     font-size: 0.9rem;
+    font-weight: 600;
 }
 
-.qrc-arrow {
-    margin: 0 1rem;
-    color: #ccc;
-    font-weight: bold;
+.pipe-step.output {
+    background: rgba(46, 204, 113, 0.15);
+    border-color: #2ecc71;
+    color: #2ecc71;
+}
+
+.pipe-step.qrc-block {
+    background: linear-gradient(135deg, rgba(227, 0, 15, 0.15), rgba(128, 0, 0, 0.4));
+    border: 1px solid var(--epfl-red);
+    padding: 1rem;
+    box-shadow: 0 0 15px rgba(227, 0, 15, 0.1) inset;
+}
+
+.qrc-internals {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+}
+
+.qrc-modes,
+.qrc-layers {
+    display: flex;
+    gap: 0.4rem;
+    justify-content: center;
+}
+
+.input-modes,
+.memory-modes,
+.layer {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    flex: 1;
+}
+
+.layer.mix {
+    color: #3498db;
+}
+
+.layer.virt {
+    color: #9b59b6;
+}
+
+.memory-modes {
+    color: #f1c40f;
+}
+
+.input-modes {
+    color: #1abc9c;
+}
+
+.qrc-ensemble {
+    margin-top: 0.2rem;
+    padding: 0.4rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.pipe-step.split {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sub-process {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 0.6rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    flex: 1;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sub-process.alg-accent {
+    border-color: rgba(155, 89, 182, 0.5);
+    background: rgba(155, 89, 182, 0.1);
+    color: #dfa6f5;
+}
+
+.pipe-step .plus {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #666;
+}
+
+.pipe-anim-arrow {
+    color: var(--epfl-red);
+    font-size: 1.2rem;
+    margin: 0.3rem 0;
+    animation: flow-down 1.2s infinite;
+}
+
+@keyframes flow-down {
+    0% {
+        transform: translateY(-3px);
+        opacity: 0.3;
+    }
+
+    50% {
+        transform: translateY(3px);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-3px);
+        opacity: 0.3;
+    }
+}
+
+.pipe-step.regress {
+    background: rgba(52, 152, 219, 0.1);
+    border: 1px solid rgba(52, 152, 219, 0.5);
+    padding: 0.8rem;
+    color: #85c1e9;
+    font-weight: 600;
 }
 
 /* Results */

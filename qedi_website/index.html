@@ -153,20 +153,61 @@
                     </ul>
                 </div>
                 <div class="visual-placeholder">
-                    <!-- CSS driven architecture animation -->
-                    <div class="qrc-anim">
-                        <div class="qrc-input">Data (Day N)</div>
-                        <div class="qrc-arrow">→</div>
-                        <div class="qrc-reservoir">
-                            <div class="qrc-node n1"></div>
-                            <div class="qrc-node n2"></div>
-                            <div class="qrc-node n3"></div>
-                            <div class="qrc-node n4"></div>
-                            <div class="qrc-node n5"></div>
-                            <div class="qrc-core">Entanglement</div>
+                    <!-- PT-QRC Pipeline Animation -->
+                    <div class="pipeline-container">
+                        <div class="pipe-step process">
+                            <div class="label">Raw Market Surface (224D)</div>
                         </div>
-                        <div class="qrc-arrow">→</div>
-                        <div class="qrc-output">Forecast (Day N+1)</div>
+                        <div class="pipe-anim-arrow">↓</div>
+                        <div class="pipe-step split">
+                            <div class="sub-process">StandardScaler</div>
+                            <div class="sub-process">PCA (5D)</div>
+                        </div>
+                        <div class="pipe-anim-arrow">↓</div>
+                        <div class="pipe-step process">
+                            <div class="label">Rolling 5-Day Window (1×25)</div>
+                        </div>
+                        <div class="pipe-anim-arrow">↓</div>
+                        <div class="pipe-step qrc-block">
+                            <div
+                                style="font-weight: 800; color: white; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;">
+                                Photonic Temporal QRC</div>
+                            <div class="qrc-internals">
+                                <div class="qrc-modes">
+                                    <div class="input-modes">5 Input Modes<br><span
+                                            style="font-size: 0.7rem; color: #ccc;">(Phase Encoded)</span></div>
+                                    <div class="memory-modes">3 Memory Modes<br><span
+                                            style="font-size: 0.7rem; color: #ccc;">(Unencoded Loop)</span></div>
+                                </div>
+                                <div class="qrc-layers">
+                                    <div class="layer mix">Temporal Loop<br><span
+                                            style="font-size: 0.7rem; color: #ccc;">(5 Time Steps)</span></div>
+                                    <div class="layer virt">Virtual Nodes<br><span
+                                            style="font-size: 0.7rem; color: #ccc;">(Depths 1, 2, 3)</span></div>
+                                </div>
+                                <div class="qrc-ensemble">
+                                    3 Seeds × 3 Virtual Nodes = 9 Circuits
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pipe-anim-arrow">↓</div>
+                        <div class="pipe-step split">
+                            <div class="sub-process alg-accent">LexGrouping Probability<br><span
+                                    style="font-size: 0.75rem;">(90 Quantum Features)</span></div>
+                            <span class="plus">+</span>
+                            <div class="sub-process">Raw Window<br><span style="font-size: 0.75rem;">(25 Classic
+                                    Features)</span></div>
+                        </div>
+                        <div class="pipe-anim-arrow">↓</div>
+                        <div class="pipe-step regress">
+                            <div class="label">L2 Ridge Regression Forecaster (α=10.0)</div>
+                            <div style="font-size: 0.75rem; margin-top: 0.2rem; color: rgba(255,255,255,0.7);">Inverse
+                                PCA &rarr; Inverse Scaler</div>
+                        </div>
+                        <div class="pipe-anim-arrow">↓</div>
+                        <div class="pipe-step process output">
+                            <div class="label">Day T+1 Swaption Forecast (224D)</div>
+                        </div>
                     </div>
                 </div>
             </div>
