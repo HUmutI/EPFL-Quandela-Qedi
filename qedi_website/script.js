@@ -574,7 +574,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'QSVR (Quantum SVR)',
             'Hybrid QNN',
             'Standard Photonic QRC',
-            '<b>🥇 Photonic Temporal QRC (Our Final)</b>'
+            '<b>🥇 Photonic Temporal QRC</b>'
         ];
 
         // Data populated from experiment_logs.json + final_model.py + temporal_qrc.py outputs
