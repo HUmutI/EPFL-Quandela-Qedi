@@ -555,21 +555,13 @@ def main():
     
     all_metrics = []
     
-    # 0. Naive Baseline (Tomorrow = Today)
-    print("\n\n======== EVALUATING NAIVE BASELINE ========")
-    all_metrics.append(evaluate_naive_baseline(X_test, y_test, pca, scaler))
-    
     # 1. Classical LSTM Baseline 
     print("\n\n======== TRAINING CLASSICAL LSTM BASELINE ========")
     lstm = ClassicalLSTM(input_dim=LATENT_DIM, hidden_dim=32, output_dim=LATENT_DIM)
     lstm, _ = train_model(lstm, "Classical LSTM", X_train, y_train, X_val, y_val)
     all_metrics.append(evaluate_model(lstm, "Classical LSTM", X_test, y_test, pca, scaler))
     
-    # 2. Random Forest Baseline
-    print("\n\n======== TRAINING CLASSICAL RANDOM FOREST ========")
-    all_metrics.append(evaluate_random_forest(X_train, y_train, X_test, y_test, pca, scaler))
-    
-    # 3. Champion Hybrid QNN 
+    # 2. Champion Hybrid QNN 
     print("\n\n======== TRAINING CHAMPION HYBRID QNN ========")
     qnn = HybridQNN(input_dim=LATENT_DIM, output_dim=LATENT_DIM, n_layers=QNN_LAYERS)
     qnn, _ = train_model(qnn, "Champion Hybrid QNN", X_train, y_train, X_val, y_val)
@@ -579,7 +571,7 @@ def main():
     six_day_breakdown = evaluate_6_day_forecast(qnn, "Champion Hybrid QNN", X_val, y_test, pca, scaler)
     all_metrics.append({"6_Day_Forecast_Breakdown": six_day_breakdown})
     
-    # 4. QSVR (Quantum Kernel Model)
+    # 3. QSVR (Quantum Kernel Model)
     print("\n\n======== TRAINING QUANTUM SVR (QSVR) ========")
     all_metrics.append(evaluate_qsvr(X_train, y_train, X_test, y_test, pca, scaler))
     
