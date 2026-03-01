@@ -17,14 +17,15 @@
         <div class="top-nav">
             <div style="display: flex; align-items: center; gap: 15px;">
                 <div class="team-logo-text">TEAM <span>QEDI</span></div>
-                <img src="assets/qat_logo_white.png" alt="QAT Logo" style="height: 175px;">
             </div>
             <div class="university-logos">
                 <div class="logo-box metu-logo">
-                    <img src="assets/metu_logo.png" alt="METU Logo">
+                    <a href="https://www.metu.edu.tr/tr" target="_blank"><img src="assets/metu_logo.png"
+                            alt="METU Logo"></a>
                 </div>
                 <div class="logo-box bilkent-logo">
-                    <img src="assets/bilkent_logo.png" alt="Bilkent Logo">
+                    <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank"><img
+                            src="assets/bilkent_logo.png" alt="Bilkent Logo"></a>
                 </div>
             </div>
         </div>
@@ -38,10 +39,12 @@
 
             <div class="team-container">
                 <div class="team-members">
-                    <span>Eren Aslan</span>
-                    <span>Hüseyin Umut Işık</span>
-                    <span>Arda Kara</span>
-                    <span>Mehmet Alp Özaydın</span>
+                    <a href="https://www.linkedin.com/in/eren-aslan-421b66191/" target="_blank">Eren Aslan</a>
+                    <a href="https://www.linkedin.com/in/h%C3%BCseyin-umut-i%C5%9F%C4%B1k-7b3ba4255/"
+                        target="_blank">Hüseyin Umut Işık</a>
+                    <a href="https://www.linkedin.com/in/arda-kara0/" target="_blank">Arda Kara</a>
+                    <a href="https://www.linkedin.com/in/mehmet-alp-%C3%B6zayd%C4%B1n-8455bb246/" target="_blank">Mehmet
+                        Alp Özaydın</a>
                 </div>
             </div>
 
@@ -73,25 +76,7 @@
         </div>
     </section>
 
-    <!-- The Sandbox Interactive -->
-    <section id="interactive" class="section bg-white">
-        <div class="container">
-            <div class="section-header">
-                <h2>02. Interactive Data Imputer</h2>
-                <div class="divider"></div>
-                <p>Try it yourself! Draw a jagged market volatility curve, <strong>leave some blank gaps</strong> (lift
-                    your mouse), and let the QRC Engine reconstruct the missing data points.</p>
-            </div>
 
-            <div class="sandbox-container">
-                <canvas id="draw-canvas"></canvas>
-                <div class="sandbox-controls">
-                    <button id="btn-clear" class="btn-secondary">Clear Market Data</button>
-                    <button id="btn-impute" class="btn-primary">Run Quantum Imputation (QRC)</button>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- Architecture Section -->
     <section id="architecture" class="section bg-light">
@@ -156,7 +141,7 @@
                     </div>
                     <div class="pipe-anim-arrow">→</div>
                     <div class="pipe-step regress">
-                        <div class="label">L2 Ridge Regression<br>(α=10.0)</div>
+                        <div class="label">L2 Ridge Regression</div>
                         <div style="font-size: 0.75rem; margin-top: 0.2rem; color: rgba(255,255,255,0.7);">Inverse PCA
                             &rarr; Inverse Scaler</div>
                     </div>
@@ -258,6 +243,17 @@
             </div>
 
             <div class="interactive-results" style="margin-top: 4rem;">
+
+                <h3 style="text-align: center; color: var(--dark-slate); margin-bottom: 2rem;">Interactive Model
+                    Performance Leaderboard</h3>
+                <div class="plot-box" style="margin-bottom: 4rem;">
+                    <div id="plot-model-comparison"
+                        style="height: 250px; width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                    </div>
+                    <p class="caption">Performance loss values compared across classical, hybrid, and pure photonic
+                        MerLin approaches.</p>
+                </div>
+
                 <h3 style="text-align: center; color: var(--dark-slate); margin-bottom: 2rem;">Interactive Error Heatmap
                     (All Horizons)</h3>
                 <div class="plot-box" style="margin-bottom: 4rem;">
@@ -289,38 +285,26 @@
                     </div>
                     <p class="caption">Tenor vs Maturity Average MAE Grid over the 6-Day Inference Horizon.</p>
                 </div>
+            </div>
+        </div>
+    </section>
 
-                <h3 style="text-align: center; color: var(--dark-slate); margin-bottom: 2rem;">Interactive Model
-                    Performance Leaderboard</h3>
-                <div class="plot-box" style="margin-bottom: 4rem;">
-                    <div id="plot-model-comparison"
-                        style="height: 250px; width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-                    </div>
-                    <p class="caption">Performance loss values compared across classical, hybrid, and pure photonic
-                        MerLin approaches.</p>
-                </div>
+    <!-- The Sandbox Interactive -->
+    <section id="interactive" class="section bg-light">
+        <div class="container">
+            <div class="section-header">
+                <h2>Interactive Data Imputer</h2>
+                <div class="divider"></div>
+                <p>Try it yourself! Draw a jagged market volatility curve, <strong>leave some blank gaps</strong> (lift
+                    your mouse), and let the QRC Engine reconstruct the missing data points.</p>
             </div>
 
-            <div class="cascade-breakdown">
-                <h3>6-Day Cascading Error Envelope</h3>
-                <p>Auto-regressive future prediction accuracy breakdown (MAPE %)</p>
-                <div class="day-tracker">
-                    <div class="day-bar" style="height: 42%;"><span class="day-label">Day 1</span><span
-                            class="val">4.2%</span></div>
-                    <div class="day-bar" style="height: 53%;"><span class="day-label">Day 2</span><span
-                            class="val">5.3%</span></div>
-                    <div class="day-bar" style="height: 50%;"><span class="day-label">Day 3</span><span
-                            class="val">5.0%</span></div>
-                    <div class="day-bar" style="height: 58%;"><span class="day-label">Day 4</span><span
-                            class="val">5.8%</span></div>
-                    <div class="day-bar" style="height: 65%;"><span class="day-label">Day 5</span><span
-                            class="val">6.5%</span></div>
-                    <div class="day-bar" style="height: 72%;"><span class="day-label">Day 6</span><span
-                            class="val">7.2%</span></div>
-                    <div class="threshold-line"></div>
+            <div class="sandbox-container">
+                <canvas id="draw-canvas"></canvas>
+                <div class="sandbox-controls">
+                    <button id="btn-clear" class="btn-secondary">Clear Market Data</button>
+                    <button id="btn-impute" class="btn-primary">Run Quantum Imputation (QRC)</button>
                 </div>
-                <p class="caption" style="text-align: center; margin-top: 1rem;">Maintains reliable sub-10% projection
-                    accuracy out to Day 6.</p>
             </div>
         </div>
     </section>
@@ -329,8 +313,8 @@
     <section class="section" style="background: linear-gradient(135deg, var(--epfl-red), #800000); padding: 4rem 2rem;">
         <div class="container" style="text-align: center;">
             <p
-                style="font-size: 2.4rem; font-weight: 400; line-height: 1.4; max-width: 800px; margin: 0 auto; color: white; letter-spacing: 0.5px;">
-                Shattering classical forecasting limits with <strong>entangled light.</strong>
+                style="font-size: 2.2rem; font-weight: 400; line-height: 1.4; max-width: 800px; margin: 0 auto; color: white; letter-spacing: 0.5px;">
+                Teaching photons to predict the market so <strong>we can finally sleep.</strong>
             </p>
         </div>
     </section>
