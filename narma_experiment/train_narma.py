@@ -18,10 +18,12 @@ def qlike_loss(y_true, y_pred):
     L(y, y_hat) = y / y_hat - log(y / y_hat) - 1
     Uses absolute values and epsilons for stability.
     Matches QRC Paper code implementation: unnormalized np.sum.
+    Both arrays are flattened first to avoid NumPy broadcasting creating
+    an N×N matrix when shapes differ (e.g. (N,1) vs (N,)).
     """
     eps = 1e-8
-    y_t = np.abs(y_true) + eps
-    y_p = np.abs(y_pred) + eps
+    y_t = np.abs(np.array(y_true).flatten()) + eps
+    y_p = np.abs(np.array(y_pred).flatten()) + eps
     ratio = y_t / y_p
     loss = ratio - np.log(ratio) - 1
     return np.sum(loss)
@@ -93,7 +95,7 @@ def pmcs_score(loss_values):
     """
     return np.mean(loss_values)
 
-def benchmark_dataset(name, y_train, y_test, X_train=None, X_test=None):
+def benchmark_dataset(name, y_train, y_test, X_train=None, X_test=None, is_log_space=False):
     print("=" * 60)
     print(f"      Running Extended Benchmarks on {name}")
     print("=" * 60)
@@ -101,47 +103,53 @@ def benchmark_dataset(name, y_train, y_test, X_train=None, X_test=None):
     results = []
     preds = {}
     
+    # Helper: compute QLIKE, exponentiating if data is in log space (e.g. S&P 500 log-RV)
+    def qlike(y_true, y_pred):
+        if is_log_space:
+            return qlike_loss(np.exp(y_true), np.exp(y_pred))
+        return qlike_loss(y_true, y_pred)
+    
     # 1. AR(1)
     print("-> Training AR(1)...")
     ar1 = ARModel(lags=1).fit(y_train)
     p_ar1 = ar1.predict(y_test)
     preds["AR1"] = p_ar1
-    results.append({"Model": "AR1", "MSE": mean_squared_error(y_test, p_ar1), "QLIKE": qlike_loss(y_test, p_ar1)})
+    results.append({"Model": "AR1", "MSE": mean_squared_error(y_test, p_ar1), "QLIKE": qlike(y_test, p_ar1)})
     
     # 2. AR(3)
     print("-> Training AR(3)...")
     ar3 = ARModel(lags=3).fit(y_train)
     p_ar3 = ar3.predict(y_test)
     preds["AR3"] = p_ar3
-    results.append({"Model": "AR3", "MSE": mean_squared_error(y_test, p_ar3), "QLIKE": qlike_loss(y_test, p_ar3)})
+    results.append({"Model": "AR3", "MSE": mean_squared_error(y_test, p_ar3), "QLIKE": qlike(y_test, p_ar3)})
     
     # 3. HAR
     print("-> Training HAR...")
     har = HARModel().fit(y_train)
     p_har = har.predict(y_test)
     preds["HAR"] = p_har
-    results.append({"Model": "HAR", "MSE": mean_squared_error(y_test, p_har), "QLIKE": qlike_loss(y_test, p_har)})
+    results.append({"Model": "HAR", "MSE": mean_squared_error(y_test, p_har), "QLIKE": qlike(y_test, p_har)})
     
     # 4. LSTM
     print("-> Training LSTM...")
     lstm = LSTMWrapper(input_dim=1).fit(y_train, y_train)
     p_lstm = lstm.predict(y_test, y_test)
     preds["LSTM"] = p_lstm
-    results.append({"Model": "LSTM", "MSE": mean_squared_error(y_test, p_lstm), "QLIKE": qlike_loss(y_test, p_lstm)})
+    results.append({"Model": "LSTM", "MSE": mean_squared_error(y_test, p_lstm), "QLIKE": qlike(y_test, p_lstm)})
     
     # 5. RC (Echo State Network)
     print("-> Training RC (Classic ESN)...")
     rc = RCModel(in_size=1).fit(y_train)
     p_rc = rc.predict(y_test)
     preds["RC"] = p_rc
-    results.append({"Model": "RC", "MSE": mean_squared_error(y_test, p_rc), "QLIKE": qlike_loss(y_test, p_rc)})
+    results.append({"Model": "RC", "MSE": mean_squared_error(y_test, p_rc), "QLIKE": qlike(y_test, p_rc)})
     
     # 6. HPT-QRC (Quantum Reservoir)
     print("-> Training HPT-QRC (Quantum Reservoir)...")
     qrc = HPT_QRC_Multi(in_size=1, window=5).fit(y_train)
     p_qrc = qrc.predict(y_test)
     preds["HPT-QRC"] = p_qrc
-    results.append({"Model": "HPT-QRC", "MSE": mean_squared_error(y_test, p_qrc), "QLIKE": qlike_loss(y_test, p_qrc)})
+    results.append({"Model": "HPT-QRC", "MSE": mean_squared_error(y_test, p_qrc), "QLIKE": qlike(y_test, p_qrc)})
 
     # Exogenous Models (if X is provided)
     if X_train is not None and X_test is not None:
@@ -152,14 +160,14 @@ def benchmark_dataset(name, y_train, y_test, X_train=None, X_test=None):
         armax = ARMAXModel(lags=1).fit(y_train, X_train)
         p_armax = armax.predict(y_test, X_test)
         preds["ARMAX"] = p_armax
-        results.append({"Model": "ARMAX", "MSE": mean_squared_error(y_test, p_armax), "QLIKE": qlike_loss(y_test, p_armax)})
+        results.append({"Model": "ARMAX", "MSE": mean_squared_error(y_test, p_armax), "QLIKE": qlike(y_test, p_armax)})
         
         # 8. HARX
         print("-> Training HARX...")
         harx = HARXModel().fit(y_train, X_train)
         p_harx = harx.predict(y_test, X_test)
         preds["HARX"] = p_harx
-        results.append({"Model": "HARX", "MSE": mean_squared_error(y_test, p_harx), "QLIKE": qlike_loss(y_test, p_harx)})
+        results.append({"Model": "HARX", "MSE": mean_squared_error(y_test, p_harx), "QLIKE": qlike(y_test, p_harx)})
         
         # 9. LSTMX
         print("-> Training LSTMX...")
@@ -169,7 +177,7 @@ def benchmark_dataset(name, y_train, y_test, X_train=None, X_test=None):
         lstmx = LSTMWrapper(input_dim=lstm_in_dim).fit(concat_train, y_train)
         p_lstmx = lstmx.predict(concat_test, y_test)
         preds["LSTMX"] = p_lstmx
-        results.append({"Model": "LSTMX", "MSE": mean_squared_error(y_test, p_lstmx), "QLIKE": qlike_loss(y_test, p_lstmx)})
+        results.append({"Model": "LSTMX", "MSE": mean_squared_error(y_test, p_lstmx), "QLIKE": qlike(y_test, p_lstmx)})
         
         # 10. RCX
         print("-> Training RCX (Exogenous ESN)...")
@@ -177,7 +185,7 @@ def benchmark_dataset(name, y_train, y_test, X_train=None, X_test=None):
         rcx = RCModel(in_size=rc_in_dim).fit(y_train, X_train)
         p_rcx = rcx.predict(y_test, X_test)
         preds["RCX"] = p_rcx
-        results.append({"Model": "RCX", "MSE": mean_squared_error(y_test, p_rcx), "QLIKE": qlike_loss(y_test, p_rcx)})
+        results.append({"Model": "RCX", "MSE": mean_squared_error(y_test, p_rcx), "QLIKE": qlike(y_test, p_rcx)})
         
         # 11. HPT-QRC-X (Exogenous Quantum Reservoir)
         print("-> Training HPT-QRC-X (Exogenous Quantum)...")
@@ -185,7 +193,7 @@ def benchmark_dataset(name, y_train, y_test, X_train=None, X_test=None):
         qrc_x = HPT_QRC_Multi(in_size=qrc_in_dim, window=5).fit(y_train, X_train)
         p_qrc_x = qrc_x.predict(y_test, X_test)
         preds["HPT-QRC-X"] = p_qrc_x
-        results.append({"Model": "HPT-QRC-X", "MSE": mean_squared_error(y_test, p_qrc_x), "QLIKE": qlike_loss(y_test, p_qrc_x)})
+        results.append({"Model": "HPT-QRC-X", "MSE": mean_squared_error(y_test, p_qrc_x), "QLIKE": qlike(y_test, p_qrc_x)})
 
     df_res = pd.DataFrame(results)
     
@@ -237,7 +245,9 @@ def main():
     print("Loading S&P 500...")
     # 'load_sp500' returns y (RV targets), and X (Exogenous markers)
     s_y_train, s_y_test, s_X_train, s_X_test = load_sp500()
-    benchmark_dataset("SP500_Realized_Volatility", s_y_train, s_y_test, X_train=s_X_train, X_test=s_X_test)
+    # is_log_space=True because the RV column is log-realized volatility (negative values)
+    # QLIKE must be computed after exp() to convert back to actual variance space
+    benchmark_dataset("SP500_Realized_Volatility", s_y_train, s_y_test, X_train=s_X_train, X_test=s_X_test, is_log_space=True)
 
 if __name__ == "__main__":
     main()

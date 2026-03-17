@@ -23,7 +23,7 @@ class HPT_QRC_Multi:
         
         # Adjust n_input_modes dynamically up to a maximum to fit W*M features
         if self.total_enc > 1:
-            self.n_input_modes = min(5, self.total_enc) 
+            self.n_input_modes = min(5, self.in_size)
             self.n_memory_modes = max(3, 8 - self.n_input_modes)
             self.n_modes = self.n_input_modes + self.n_memory_modes
             
@@ -135,18 +135,12 @@ class HPT_QRC_Multi:
         else:
             features = y_test
             
-        # For prediction, we stack the last known W steps before the test sequence
-        concat_features = np.vstack([self.last_X, features])
-        
+        # Build input sequence: last window from training + test features shifted by 1.
+        # Ridge learned: window ending at y(t) -> y(t+1). To predict y_test[k],
+        # we need a window ending at y_test[k-1] (or y_train[-1] for k=0).
+        concat_features = np.vstack([self.last_X, features[:-1]])
+
         print(f"[HPT-QRC] Extracting quantum features for {len(features)} test steps...")
         Q_features = self._create_features(concat_features)
-        
-        # _create_features outputs one feature row for every step it can build a full window for.
-        # Since we pre-pended exactly window-1 steps (from self.last_X), Q_features will have exactly len(features) rows.
-        # Wait, self.last_X contains self.window length. So we actually pre-pend W steps.
-        # But _create_features already handles its own internal padded_X which prepends zeros.
-        # Wait, _create_features is designed to pad by zeros for the first W steps of the sequence passed to it.
-        # If we pass concat_features, it will generate len(concat_features) features.
-        # So we just want the last len(features) elements of Q_features!
-        
+
         return self.ridge.predict(Q_features[-len(features):])

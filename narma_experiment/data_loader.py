@@ -76,7 +76,7 @@ def load_mackey_glass(n_train=800, n_test=200, warmup=1000, tau=17, seed=42):
     n = 10
     dt = 1.0 # Standard discrete delta
     
-    total_len = warmup + n_train + n_test + tau
+    total_len = warmup + n_train + n_test + tau + 1
     time_series = np.zeros(total_len)
     
     # Initial conditions

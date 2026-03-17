@@ -31,13 +31,16 @@ class EchoStateNetwork:
             
         self.readout = Ridge(alpha=ridge_alpha)
         
-    def _run_reservoir(self, data):
+    def _run_reservoir(self, data, init_state=None):
         """
         data: shape (n_samples, in_size)
-        returns: design matrix of shape (n_samples, 1 + in_size + res_size)
+        returns: (design_matrix, final_state) where design_matrix has shape (n_samples, 1 + in_size + res_size)
         """
         n_samples = data.shape[0]
-        state = np.zeros((self.res_size, 1))
+        if init_state is not None:
+            state = init_state.copy()
+        else:
+            state = np.zeros((self.res_size, 1))
         
         # The design matrix collects [bias, input, reservoir_state]
         design_matrix = np.zeros((n_samples, 1 + self.in_size + self.res_size))
@@ -55,7 +58,7 @@ class EchoStateNetwork:
             # Store in design matrix
             design_matrix[t, :] = np.vstack((np.array([[1.0]]), u, state)).flatten()
             
-        return design_matrix
+        return design_matrix, state
 
     def fit(self, X, y, discard_steps=100):
         """
@@ -63,14 +66,14 @@ class EchoStateNetwork:
         y: shape (n_samples, out_size)
         discard_steps: number of initial steps to discard to let reservoir initialization wash out.
         """
-        states = self._run_reservoir(X)
-        
+        states, self.last_state = self._run_reservoir(X)
+
         # Discard initial washout transient
         states = states[discard_steps:, :]
         targets = y[discard_steps:, :]
-        
+
         self.readout.fit(states, targets)
-        
+
     def predict(self, X):
-        states = self._run_reservoir(X)
+        states, self.last_state = self._run_reservoir(X, init_state=self.last_state)
         return self.readout.predict(states)
