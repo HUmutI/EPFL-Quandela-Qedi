@@ -15,11 +15,13 @@ A **swaption volatility surface** is a 2D grid indexed by tenor and maturity. Pr
 
 **The Quantum Solution:** We compress the manifold via PCA and process the temporal dynamics using a entirely newly adapted **Hybrid Photonic Temporal Quantum Reservoir Computer (HPT-QRC)** architecture. Inspired by *Li et al. (2024)*, we took their qubit-based framework and adapted it to a purely Photonic Quantum Reservoir powered by **[MerLin by Quandela](https://merlinquantum.ai/)**.
 
+You can check out our interactive showcase website here: **[https://qedi-qpfl.vercel.app](https://qedi-qpfl.vercel.app)**, featuring all challenge details and interactive visualization of our solution.
+
 ---
 
 ## ⚙️ 2. Hybrid Photonic Temporal QRC Architecture
 
-Instead of a standard QRC, we implemented a state-of-the-art **HPT-QRC pipeline**:
+Instead of a standard QRC, our best solution is the state-of-the-art **HPT-QRC pipeline** (implemented as our main architecture in `temporal_qrc.py`):
 
 1. **Preprocessing**: Raw 224D Market Surface $\rightarrow$ `StandardScaler` + `PCA (5D)` $\rightarrow$ Rolling 5-Day Window (1×25)
 2. **Dedicated Memory Modes**: Instead of mapping data to all spatial modes simultaneously, our temporal array uses **5 input modes** (phase encoded) and **3 dedicated memory modes** (unencoded loop). The memory modes continuously accumulate historical state contexts across 5 time steps through serial phase mixing.
@@ -40,16 +42,23 @@ conda activate quandela
 pip install -r requirements.txt
 ```
 
-### Validation Mode
-Train on the first $N$ rows; forecast and evaluate the next $M$ rows against ground truth.
+### Main Solution & Naive Baseline
+Our best model, the **Hybrid Photonic Temporal QRC**, along with a naive algorithm (repeat last known day) used as a baseline, is localized in `temporal_qrc.py`. Run this to reproduce our winning results:
 ```bash
-python -m src.main validate --train-rows 300 --val-rows 6
+python temporal_qrc.py
 ```
 
-### Prediction Mode
-Fit on all 494 training rows to produce the final competition submission.
+### Benchmarking Models
+We built multiple robust models to benchmark against our champion HPT-QRC architecture:
+* `final_model.py`: Runs our standard **Photonic Linear QRC** without dedicated memory modes.
+* `train_final.py`: Runs classical and hybrid benchmarks, including **Classical LSTM**, **Classical Random Forest**, **QSVR**, and **Hybrid QNN**.
+
 ```bash
-python -m src.main predict --output artifacts/submission.xlsx
+# Evaluate the base Photonic Linear QRC
+python final_model.py
+
+# Evaluate classical/hybrid benchmarking models 
+python train_final.py
 ```
 
 ---
