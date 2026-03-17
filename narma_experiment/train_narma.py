@@ -17,13 +17,14 @@ def qlike_loss(y_true, y_pred):
     QLIKE Loss used in volatility forecasting:
     L(y, y_hat) = y / y_hat - log(y / y_hat) - 1
     Uses absolute values and epsilons for stability.
+    Matches QRC Paper code implementation: unnormalized np.sum.
     """
     eps = 1e-8
     y_t = np.abs(y_true) + eps
     y_p = np.abs(y_pred) + eps
     ratio = y_t / y_p
     loss = ratio - np.log(ratio) - 1
-    return np.mean(loss)
+    return np.sum(loss)
 
 def dm_test(y_true, pred1, pred2, crit="MSE", h=1):
     """
@@ -224,11 +225,15 @@ def main():
     # 1. NARMA10 (Univariate)
     print("Loading NARMA10...")
     n_X_train, n_y_train, n_X_test, n_y_test = load_narma10()
-    # NARMA10 is generated as X (input), y (target). We treat X as the exogenous 'input' sequence. 
-    # The generation naturally creates a target trajectory based on X trailing sequence.
     benchmark_dataset("NARMA10", n_y_train, n_y_test, X_train=n_X_train, X_test=n_X_test)
     
-    # 2. S&P 500 (Multivariate with Exogenous Fama-French markers)
+    # 2. Mackey-Glass (Univariate)
+    print("Loading Mackey-Glass...")
+    from data_loader import load_mackey_glass
+    m_X_train, m_y_train, m_X_test, m_y_test = load_mackey_glass(n_train=800, n_test=200)
+    benchmark_dataset("Mackey_Glass", m_y_train, m_y_test, X_train=m_X_train, X_test=m_X_test)
+    
+    # 3. S&P 500 (Multivariate with Exogenous Fama-French markers)
     print("Loading S&P 500...")
     # 'load_sp500' returns y (RV targets), and X (Exogenous markers)
     s_y_train, s_y_test, s_X_train, s_X_test = load_sp500()

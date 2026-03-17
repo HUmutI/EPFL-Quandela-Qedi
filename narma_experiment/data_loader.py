@@ -63,3 +63,41 @@ def load_sp500(filepath="/Users/umut/Desktop/EPFL_ANTI/narma_experiment/literatu
     X_test = X_exog[n_train:]
     
     return y_train, y_test, X_train, X_test
+
+def load_mackey_glass(n_train=800, n_test=200, warmup=1000, tau=17, seed=42):
+    """
+    Generate the classic Mackey-Glass time series dataset.
+    dx/dt = beta * x(t-tau) / (1 + x(t-tau)^n) - gamma * x(t)
+    """
+    np.random.seed(seed)
+    
+    beta = 0.2
+    gamma = 0.1
+    n = 10
+    dt = 1.0 # Standard discrete delta
+    
+    total_len = warmup + n_train + n_test + tau
+    time_series = np.zeros(total_len)
+    
+    # Initial conditions
+    time_series[:tau] = 1.2 + 0.1 * (np.random.rand(tau) - 0.5)
+    
+    for t in range(tau, total_len - 1):
+        x_tau = time_series[t - tau]
+        # Runge-Kutta 4th Order estimation (or Euler for simple discrete stepping)
+        # We will use simple Euler integration for speed matching NARMA standard
+        delta = (beta * x_tau / (1.0 + x_tau**n)) - (gamma * time_series[t])
+        time_series[t+1] = time_series[t] + delta * dt
+        
+    y_final = time_series[warmup+tau:]
+    # For prediction, X(t) represents the sequence to predict y(t+1)
+    
+    # Let's standardize it: input X is previous step, output y is next step
+    # For MG, we often want to predict multiple steps, but we'll stick to 1-step ahead
+    # X_train is standard univariate.
+    X_train = y_final[:n_train].reshape(-1, 1)
+    y_train = y_final[1:n_train+1].reshape(-1, 1)
+    X_test = y_final[n_train:-1].reshape(-1, 1)
+    y_test = y_final[n_train+1:].reshape(-1, 1)
+    
+    return X_train, y_train, X_test, y_test
