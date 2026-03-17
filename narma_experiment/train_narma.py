@@ -3,6 +3,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import scipy.stats
 from sklearn.metrics import mean_squared_error
 
 from data_loader import load_narma10, load_sp500
@@ -24,6 +25,63 @@ def qlike_loss(y_true, y_pred):
     loss = ratio - np.log(ratio) - 1
     return np.mean(loss)
 
+def dm_test(y_true, pred1, pred2, crit="MSE", h=1):
+    """
+    Computes the Diebold-Mariano test statistic between two arrays of predictions.
+    Null Hypothesis: The two models have equal predictive accuracy.
+    """
+    e1 = y_true.flatten() - pred1.flatten()
+    e2 = y_true.flatten() - pred2.flatten()
+    
+    if crit == "MSE":
+        d = e1**2 - e2**2
+    elif crit == "QLIKE":
+        eps = 1e-8
+        y = np.abs(y_true.flatten()) + eps
+        p1 = np.abs(pred1.flatten()) + eps
+        p2 = np.abs(pred2.flatten()) + eps
+        d = (y/p1 - np.log(y/p1) - 1) - (y/p2 - np.log(y/p2) - 1)
+    else:
+        d = np.abs(e1) - np.abs(e2)
+        
+    d_mean = np.mean(d)
+    T = float(len(d))
+    
+    gamma = []
+    for lag in range(0, h):
+        gamma.append(np.sum((d[lag:] - d_mean) * (d[:len(d)-lag] - d_mean)) / T)
+        
+    V_d = gamma[0] + 2 * sum(gamma[1:])
+    
+    if V_d == 0:
+        return 0.0, 1.0
+        
+    stat = d_mean / np.sqrt(V_d / T)
+    p_value = 2 * (1 - scipy.stats.norm.cdf(np.abs(stat)))
+    return stat, p_value
+
+def generate_dm_table(y_true, preds_dict, crit="MSE"):
+    """
+    Generates a combined DM table similar to literature:
+    Lower triangle = DM stat values
+    Upper triangle = p-values
+    """
+    models = list(preds_dict.keys())
+    n = len(models)
+    combined = pd.DataFrame(index=models, columns=models, dtype=object)
+    
+    for i in range(n):
+        for j in range(n):
+            if i == j:
+                combined.iloc[i, j] = ""
+            else:
+                stat, p = dm_test(y_true, preds_dict[models[i]], preds_dict[models[j]], crit=crit)
+                if i > j: # Lower triangular -> DM Stat
+                    combined.iloc[i, j] = f"{stat:.3f}"
+                else: # Upper triangular -> p-value
+                    combined.iloc[i, j] = f"{p:.3f}"
+    return combined
+
 def pmcs_score(loss_values):
     """
     Placeholder for Model Confidence Set PMCS score computation.
@@ -40,41 +98,48 @@ def benchmark_dataset(name, y_train, y_test, X_train=None, X_test=None):
     print("=" * 60)
     
     results = []
+    preds = {}
     
     # 1. AR(1)
     print("-> Training AR(1)...")
     ar1 = ARModel(lags=1).fit(y_train)
     p_ar1 = ar1.predict(y_test)
+    preds["AR1"] = p_ar1
     results.append({"Model": "AR1", "MSE": mean_squared_error(y_test, p_ar1), "QLIKE": qlike_loss(y_test, p_ar1)})
     
     # 2. AR(3)
     print("-> Training AR(3)...")
     ar3 = ARModel(lags=3).fit(y_train)
     p_ar3 = ar3.predict(y_test)
+    preds["AR3"] = p_ar3
     results.append({"Model": "AR3", "MSE": mean_squared_error(y_test, p_ar3), "QLIKE": qlike_loss(y_test, p_ar3)})
     
     # 3. HAR
     print("-> Training HAR...")
     har = HARModel().fit(y_train)
     p_har = har.predict(y_test)
+    preds["HAR"] = p_har
     results.append({"Model": "HAR", "MSE": mean_squared_error(y_test, p_har), "QLIKE": qlike_loss(y_test, p_har)})
     
     # 4. LSTM
     print("-> Training LSTM...")
     lstm = LSTMWrapper(input_dim=1).fit(y_train, y_train)
     p_lstm = lstm.predict(y_test, y_test)
+    preds["LSTM"] = p_lstm
     results.append({"Model": "LSTM", "MSE": mean_squared_error(y_test, p_lstm), "QLIKE": qlike_loss(y_test, p_lstm)})
     
     # 5. RC (Echo State Network)
     print("-> Training RC (Classic ESN)...")
     rc = RCModel(in_size=1).fit(y_train)
     p_rc = rc.predict(y_test)
+    preds["RC"] = p_rc
     results.append({"Model": "RC", "MSE": mean_squared_error(y_test, p_rc), "QLIKE": qlike_loss(y_test, p_rc)})
     
     # 6. HPT-QRC (Quantum Reservoir)
     print("-> Training HPT-QRC (Quantum Reservoir)...")
     qrc = HPT_QRC_Multi(in_size=1, window=5).fit(y_train)
     p_qrc = qrc.predict(y_test)
+    preds["HPT-QRC"] = p_qrc
     results.append({"Model": "HPT-QRC", "MSE": mean_squared_error(y_test, p_qrc), "QLIKE": qlike_loss(y_test, p_qrc)})
 
     # Exogenous Models (if X is provided)
@@ -85,12 +150,14 @@ def benchmark_dataset(name, y_train, y_test, X_train=None, X_test=None):
         print("-> Training ARMAX(1,0,0)...")
         armax = ARMAXModel(lags=1).fit(y_train, X_train)
         p_armax = armax.predict(y_test, X_test)
+        preds["ARMAX"] = p_armax
         results.append({"Model": "ARMAX", "MSE": mean_squared_error(y_test, p_armax), "QLIKE": qlike_loss(y_test, p_armax)})
         
         # 8. HARX
         print("-> Training HARX...")
         harx = HARXModel().fit(y_train, X_train)
         p_harx = harx.predict(y_test, X_test)
+        preds["HARX"] = p_harx
         results.append({"Model": "HARX", "MSE": mean_squared_error(y_test, p_harx), "QLIKE": qlike_loss(y_test, p_harx)})
         
         # 9. LSTMX
@@ -100,6 +167,7 @@ def benchmark_dataset(name, y_train, y_test, X_train=None, X_test=None):
         concat_test = np.hstack([y_test, X_test])
         lstmx = LSTMWrapper(input_dim=lstm_in_dim).fit(concat_train, y_train)
         p_lstmx = lstmx.predict(concat_test, y_test)
+        preds["LSTMX"] = p_lstmx
         results.append({"Model": "LSTMX", "MSE": mean_squared_error(y_test, p_lstmx), "QLIKE": qlike_loss(y_test, p_lstmx)})
         
         # 10. RCX
@@ -107,6 +175,7 @@ def benchmark_dataset(name, y_train, y_test, X_train=None, X_test=None):
         rc_in_dim = 1 + X_train.shape[1]
         rcx = RCModel(in_size=rc_in_dim).fit(y_train, X_train)
         p_rcx = rcx.predict(y_test, X_test)
+        preds["RCX"] = p_rcx
         results.append({"Model": "RCX", "MSE": mean_squared_error(y_test, p_rcx), "QLIKE": qlike_loss(y_test, p_rcx)})
         
         # 11. HPT-QRC-X (Exogenous Quantum Reservoir)
@@ -114,13 +183,21 @@ def benchmark_dataset(name, y_train, y_test, X_train=None, X_test=None):
         qrc_in_dim = 1 + X_train.shape[1]
         qrc_x = HPT_QRC_Multi(in_size=qrc_in_dim, window=5).fit(y_train, X_train)
         p_qrc_x = qrc_x.predict(y_test, X_test)
+        preds["HPT-QRC-X"] = p_qrc_x
         results.append({"Model": "HPT-QRC-X", "MSE": mean_squared_error(y_test, p_qrc_x), "QLIKE": qlike_loss(y_test, p_qrc_x)})
 
     df_res = pd.DataFrame(results)
     
+    # Generate DM Table for MSE
+    dm_table_mse = generate_dm_table(y_test, preds, crit="MSE")
+    # Generate DM Table for QLIKE
+    dm_table_qlike = generate_dm_table(y_test, preds, crit="QLIKE")
+    
     # Save Results
     os.makedirs("results", exist_ok=True)
     df_res.to_csv(f"results/{name}_benchmark.csv", index=False)
+    dm_table_mse.to_csv(f"results/{name}_DM_MSE.csv")
+    dm_table_qlike.to_csv(f"results/{name}_DM_QLIKE.csv")
     
     # Generate Plot
     plt.figure(figsize=(14, 7))
