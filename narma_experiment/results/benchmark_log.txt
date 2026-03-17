@@ -1,0 +1,13 @@
+NARMA10 Benchmark
+--------------------
+Train size = 2000, Test size = 1000
+
+Classical ESN:
+   NRMSE: 9.5697
+   MSE:   9.9160e-01
+   MAE:   0.1606
+
+HPT-QRC:
+   NRMSE: 0.8254
+   MSE:   7.3762e-03
+   MAE:   0.0689
