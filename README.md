@@ -1,6 +1,6 @@
 <div align="center">
   <h1>Team Qedi 🐈‍⬛</h1>
-  <p><strong>EPFL Quantum Hackathon 2026 • Quandela Challenge</strong></p>
+  <p><strong>EPFL Quantum Hackathon 2026 • Quandela Challenge - 1st Place</strong></p>
   <h3>Hybrid Photonic Temporal QRC (HPT-QRC) — Swaption Volatility Surface Forecaster</h3>
   <p><i>Teaching photons to predict the market so we can finally sleep.</i></p>
 </div>
